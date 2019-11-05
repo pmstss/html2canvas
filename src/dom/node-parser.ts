@@ -10,6 +10,7 @@ import {InputElementContainer} from './replaced-elements/input-element-container
 import {SelectElementContainer} from './elements/select-element-container';
 import {TextareaElementContainer} from './elements/textarea-element-container';
 import {IFrameElementContainer} from './replaced-elements/iframe-element-container';
+import {AnchorElementContainer} from './elements/anchor-element-container';
 
 const LIST_OWNERS = ['OL', 'UL', 'MENU'];
 
@@ -78,6 +79,10 @@ const createContainer = (element: Element): ElementContainer => {
         return new IFrameElementContainer(element);
     }
 
+    if (isAnchorElement(element)) {
+        return new AnchorElementContainer(element);
+    }
+
     return new ElementContainer(element);
 };
 
@@ -117,3 +122,4 @@ export const isStyleElement = (node: Element): node is HTMLStyleElement => node.
 export const isScriptElement = (node: Element): node is HTMLScriptElement => node.tagName === 'SCRIPT';
 export const isTextareaElement = (node: Element): node is HTMLTextAreaElement => node.tagName === 'TEXTAREA';
 export const isSelectElement = (node: Element): node is HTMLSelectElement => node.tagName === 'SELECT';
+export const isAnchorElement = (node: Element): node is HTMLAnchorElement => node.tagName === 'A';

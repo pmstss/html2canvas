@@ -37,6 +37,7 @@ import {TEXT_ALIGN} from '../../css/property-descriptors/text-align';
 import {TextareaElementContainer} from '../../dom/elements/textarea-element-container';
 import {SelectElementContainer} from '../../dom/elements/select-element-container';
 import {IFrameElementContainer} from '../../dom/replaced-elements/iframe-element-container';
+import {AnchorElementContainer} from '../../dom/elements/anchor-element-container';
 import {TextShadow} from '../../css/property-descriptors/text-shadow';
 
 export type RenderConfigurations = RenderOptions & {
@@ -56,6 +57,7 @@ export interface RenderOptions {
     windowWidth: number;
     windowHeight: number;
     cache: Cache;
+    linkCallback?: (href: string, bounds: {left: number; top: number; width: number; height: number}) => void;
 }
 
 const MASK_OFFSET = 10000;
@@ -265,6 +267,11 @@ export class CanvasRenderer {
         const container = paint.container;
         const curves = paint.curves;
         const styles = container.styles;
+
+        if (container instanceof AnchorElementContainer && this.options.linkCallback) {
+            this.options.linkCallback(container.href, container.bounds);
+        }
+
         for (const child of container.textNodes) {
             await this.renderTextNode(child, styles);
         }
