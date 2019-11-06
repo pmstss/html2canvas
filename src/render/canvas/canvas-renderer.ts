@@ -238,15 +238,15 @@ export class CanvasRenderer {
 
     renderReplacedElement(
         container: ReplacedElementContainer,
-        curves: BoundCurves,
+        _curves: BoundCurves,
         image: HTMLImageElement | HTMLCanvasElement
     ) {
         if (image && container.intrinsicWidth > 0 && container.intrinsicHeight > 0) {
             const box = contentBox(container);
-            const path = calculatePaddingBoxPath(curves);
-            this.path(path);
-            this.ctx.save();
-            this.ctx.clip();
+            // const path = calculatePaddingBoxPath(curves);
+            // this.path(path);
+            // this.ctx.save();
+            // this.ctx.clip();
             this.ctx.drawImage(
                 image,
                 0,
@@ -258,7 +258,7 @@ export class CanvasRenderer {
                 box.width,
                 box.height
             );
-            this.ctx.restore();
+            // this.ctx.restore();
         }
     }
 
