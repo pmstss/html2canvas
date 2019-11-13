@@ -222,7 +222,8 @@ export class CanvasRenderer {
                             break;
                         case TEXT_DECORATION_LINE.LINE_THROUGH:
                             // TODO try and find exact position for line-through
-                            const {middle} = this.fontMetrics.getMetrics(fontFamily, fontSize);
+                            // const {middle} = this.fontMetrics.getMetrics(fontFamily, fontSize);
+                            const middle = Math.floor(text.bounds.height / 2) + 1;
                             this.ctx.fillRect(
                                 text.bounds.left,
                                 Math.ceil(text.bounds.top + middle),
