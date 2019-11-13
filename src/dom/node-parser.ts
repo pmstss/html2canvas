@@ -11,6 +11,8 @@ import {SelectElementContainer} from './elements/select-element-container';
 import {TextareaElementContainer} from './elements/textarea-element-container';
 import {IFrameElementContainer} from './replaced-elements/iframe-element-container';
 import {AnchorElementContainer} from './elements/anchor-element-container';
+import {WORD_BREAK} from '../css/property-descriptors/word-break';
+import {Bounds} from '../css/layout/bounds';
 
 const LIST_OWNERS = ['OL', 'UL', 'MENU'];
 
@@ -19,7 +21,83 @@ const parseNodeTree = (node: Node, parent: ElementContainer, root: ElementContai
         nextNode = childNode.nextSibling;
 
         if (isTextNode(childNode) && childNode.data.trim().length > 0) {
-            parent.textNodes.push(new TextContainer(childNode, parent.styles));
+            /*
+              If node has more than 1 client rect, its bounding polygon is not always rect,
+              so using getBoundingClientRect() further for drawing background leads to incorrect results.
+              Workaround: split text node into single-rect text nodes with putting each one into aux ElementContainer,
+              that inherits background props (color, etc) from parent node.
+            */
+            if (!node.ownerDocument) {
+                continue;
+            }
+
+            const r = node.ownerDocument.createRange();
+            let textNode = childNode;
+            r.selectNodeContents(textNode);
+
+            const textNodes = [];
+            if (r.getClientRects().length > 1) {
+                let i = 0;
+                while (textNode && ++i < textNode.data.length) {
+                    r.setEnd(textNode, i);
+                    if (r.getClientRects().length > 1) {
+                        textNode = textNode.splitText(i - 1);
+                        textNodes.push(textNode.previousSibling);
+                        r.selectNodeContents(textNode);
+                        i = 0;
+                    }
+                }
+
+                if (textNode.data.length) {
+                    textNodes.push(textNode);
+                }
+
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const styles = new CSSParsedDeclaration(window.getComputedStyle((node as any) as Element, null));
+                /*
+                  After "manual" dividing into single client rect element, reset word-break property to avoid
+                  redundant additional processing by LineBreaker (see breakText())
+                 */
+                styles.wordBreak = WORD_BREAK.NORMAL;
+
+                /*
+                  Aux ElementContainer will inherit background color, so parent color can be omited to avoid
+                  drawing "invalid" BoundingClientRect.
+                 */
+                parent.styles.backgroundColor = 0;
+
+                parent.elements.push(
+                    ...textNodes.map((n: Text) => {
+                        r.selectNode(n);
+                        const auxTextContainer = new ElementContainer(
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            (null as any) as Element,
+                            styles,
+                            Bounds.fromClientRect(r.getBoundingClientRect())
+                        );
+                        auxTextContainer.textNodes.push(new TextContainer(n, styles));
+                        return auxTextContainer;
+                    })
+                );
+            } else {
+                /*
+                  Well, for node that already has single client rect, for properly inherited background color,
+                  aux ElementContainer should be created too.
+                */
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const styles = new CSSParsedDeclaration(window.getComputedStyle((node as any) as Element, null));
+                styles.wordBreak = WORD_BREAK.NORMAL;
+                r.selectNode(childNode);
+                const auxTextContainer = new ElementContainer(
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    (null as any) as Element,
+                    styles,
+                    Bounds.fromClientRect(r.getBoundingClientRect())
+                );
+                auxTextContainer.textNodes.push(new TextContainer(childNode, parent.styles));
+
+                parent.elements.push(auxTextContainer);
+            }
         } else if (isElementNode(childNode)) {
             const container = createContainer(childNode);
             if (container.styles.isVisible()) {
