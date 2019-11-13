@@ -6,9 +6,9 @@ export class TextContainer {
     text: string;
     textBounds: TextBounds[];
 
-    constructor(node: Text, styles: CSSParsedDeclaration) {
+    constructor(node: Text, styles: CSSParsedDeclaration, bounds?: TextBounds[]) {
         this.text = transform(node.data, styles.textTransform);
-        this.textBounds = parseTextBounds(this.text, styles, node);
+        this.textBounds = bounds || parseTextBounds(this.text, styles, node);
     }
 }
 
