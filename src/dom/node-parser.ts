@@ -74,9 +74,17 @@ const parseNodeTree = (node: Node, parent: ElementContainer, root: ElementContai
              */
             parent.styles.backgroundColor = 0;
 
+            // TODO: trivial space normalization, could be wrong in some cases; improve
+            const getNormalizedText = (txt: Text): string => {
+                const parent = txt.parentElement as HTMLElement;
+                return (txt.textContent || '').includes(parent.innerText)
+                    ? parent.innerText
+                    : (txt.textContent || '').replace(/[\t\n\r ]+/g, ' ');
+            };
+
             parent.elements.push(
                 ...textNodes.map((n: Text) => {
-                    r.selectNode(n);
+                    r.selectNodeContents(n);
                     const bounds = Bounds.fromClientRect(r.getBoundingClientRect());
                     const auxTextContainer = new ElementContainer(
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -84,7 +92,7 @@ const parseNodeTree = (node: Node, parent: ElementContainer, root: ElementContai
                         styles,
                         bounds
                     );
-                    auxTextContainer.textNodes.push(new TextContainer(n, styles, [new TextBounds(n.data, bounds)]));
+                    auxTextContainer.textNodes.push(new TextContainer(n, styles, [new TextBounds(getNormalizedText(n), bounds)]));
                     return auxTextContainer;
                 })
             );
