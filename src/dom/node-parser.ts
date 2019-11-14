@@ -39,7 +39,7 @@ const parseNodeTree = (node: Node, parent: ElementContainer, root: ElementContai
             const textNodes = [];
             if (r.getClientRects().length > 1) {
                 let i = 0;
-                while (textNode && ++i < textNode.data.length) {
+                while (textNode && ++i <= textNode.data.length) {
                     r.setEnd(textNode, i);
                     if (r.getClientRects().length > 1) {
                         textNode = textNode.splitText(i - 1);
