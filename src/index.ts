@@ -69,7 +69,8 @@ const renderElement = async (element: HTMLElement, opts: Partial<Options>): Prom
         y: top,
         width: Math.ceil(width),
         height: Math.ceil(height),
-        id: instanceName
+        id: instanceName,
+        cloneDisabled: false
     };
 
     const options: Options = {...defaultOptions, ...resourceOptions, ...opts};
@@ -77,20 +78,27 @@ const renderElement = async (element: HTMLElement, opts: Partial<Options>): Prom
     const windowBounds = new Bounds(options.scrollX, options.scrollY, options.windowWidth, options.windowHeight);
 
     Logger.create({id: instanceName, enabled: options.logging});
-    Logger.getInstance(instanceName).debug(`Starting document clone`);
-    const documentCloner = new DocumentCloner(element, {
-        id: instanceName,
-        onclone: options.onclone,
-        ignoreElements: options.ignoreElements,
-        inlineImages: options.foreignObjectRendering,
-        copyStyles: options.foreignObjectRendering
-    });
-    const clonedElement = documentCloner.clonedReferenceElement;
+
+    let clonedElement: HTMLElement | undefined;
+    let container: HTMLIFrameElement | null = null;
+    if (!options.cloneDisabled) {
+        Logger.getInstance(instanceName).debug(`Starting document clone`);
+        const documentCloner = new DocumentCloner(element, {
+            id: instanceName,
+            onclone: options.onclone,
+            ignoreElements: options.ignoreElements,
+            inlineImages: options.foreignObjectRendering,
+            copyStyles: options.foreignObjectRendering
+        });
+        clonedElement = documentCloner.clonedReferenceElement;
+        container = await documentCloner.toIFrame(ownerDocument, windowBounds);
+    } else {
+        clonedElement = element;
+    }
+
     if (!clonedElement) {
         return Promise.reject(`Unable to find element in cloned iframe`);
     }
-
-    const container = await documentCloner.toIFrame(ownerDocument, windowBounds);
 
     // http://www.w3.org/TR/css3-background/#special-backgrounds
     const documentBackgroundColor = ownerDocument.documentElement
@@ -154,7 +162,7 @@ const renderElement = async (element: HTMLElement, opts: Partial<Options>): Prom
         canvas = await renderer.render(root);
     }
 
-    if (options.removeContainer === true) {
+    if (container && options.removeContainer === true) {
         if (!DocumentCloner.destroy(container)) {
             Logger.getInstance(instanceName).error(`Cannot detach cloned iframe as it is not in the DOM anymore`);
         }

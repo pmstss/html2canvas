@@ -23,6 +23,7 @@ export interface CloneOptions {
     id: string;
     ignoreElements?: (element: Element) => boolean;
     onclone?: (document: Document) => void;
+    cloneDisabled?: boolean;
 }
 
 export type CloneConfigurations = CloneOptions & {
