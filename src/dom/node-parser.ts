@@ -1,4 +1,4 @@
-import {CSSParsedDeclaration} from '../css/index';
+import {CSSParsedDeclaration} from '../css';
 import {ElementContainer, FLAGS} from './element-container';
 import {TextContainer} from './text-container';
 import {ImageElementContainer} from './replaced-elements/image-element-container';
@@ -17,6 +17,45 @@ import {TextBounds} from '../css/layout/text';
 
 const LIST_OWNERS = ['OL', 'UL', 'MENU'];
 
+const splitTextByLineWrapsLinear = (textNode: Text, range?: Range): Text[] => {
+    range = range || (textNode.ownerDocument as Document).createRange();
+    range.selectNodeContents(textNode);
+
+    const textNodes: Text[] = [];
+    if (range.getClientRects().length > 1) {
+        let i = 0;
+        while (textNode && ++i <= textNode.data.length) {
+            range.setEnd(textNode, i);
+            if (range.getClientRects().length > 1) {
+                textNode = textNode.splitText(i - 1);
+                textNodes.push(textNode.previousSibling as Text);
+                range.selectNodeContents(textNode);
+                i = 0;
+            }
+        }
+
+        if (textNode.data.length) {
+            textNodes.push(textNode);
+        }
+    } else {
+        /*
+          For node that already has single client rect, for properly inherited background color,
+          aux ElementContainer should be created too.
+        */
+        textNodes.push(textNode);
+    }
+
+    return textNodes;
+};
+
+// TODO: trivial space normalization, could be wrong in some cases; improve
+const getNormalizedText = (txt: Text): string => {
+    const parent = txt.parentElement as HTMLElement;
+    return (txt.textContent || '').includes(parent.innerText)
+        ? parent.innerText
+        : (txt.textContent || '').replace(/[\t\n\r ]+/g, ' ');
+};
+
 const parseNodeTree = (node: Node, parent: ElementContainer, root: ElementContainer) => {
     for (let childNode = node.firstChild, nextNode; childNode; childNode = nextNode) {
         nextNode = childNode.nextSibling;
@@ -28,40 +67,10 @@ const parseNodeTree = (node: Node, parent: ElementContainer, root: ElementContai
               Workaround: split text node into single-rect text nodes with putting each one into aux ElementContainer,
               that inherits background props (color, etc) from parent node.
             */
-            if (!node.ownerDocument) {
-                continue;
-            }
+            const r = (node.ownerDocument as Document).createRange();
+            const textNodes = splitTextByLineWrapsLinear(childNode, r);
 
-            const r = node.ownerDocument.createRange();
-            let textNode = childNode;
-            r.selectNodeContents(textNode);
-
-            const textNodes = [];
-            if (r.getClientRects().length > 1) {
-                let i = 0;
-                while (textNode && ++i <= textNode.data.length) {
-                    r.setEnd(textNode, i);
-                    if (r.getClientRects().length > 1) {
-                        textNode = textNode.splitText(i - 1);
-                        textNodes.push(textNode.previousSibling);
-                        r.selectNodeContents(textNode);
-                        i = 0;
-                    }
-                }
-
-                if (textNode.data.length) {
-                    textNodes.push(textNode);
-                }
-            } else {
-                /*
-                  Well, for node that already has single client rect, for properly inherited background color,
-                  aux ElementContainer should be created too.
-                */
-                textNodes.push(textNode);
-            }
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const styles = new CSSParsedDeclaration(window.getComputedStyle((node as any) as Element, null));
+            const styles = new CSSParsedDeclaration(window.getComputedStyle(node as Element, null));
             /*
               After "manual" dividing into single client rect element, reset word-break property to avoid
               redundant additional processing by LineBreaker (see breakText())
@@ -74,14 +83,6 @@ const parseNodeTree = (node: Node, parent: ElementContainer, root: ElementContai
              */
             parent.styles.backgroundColor = 0;
 
-            // TODO: trivial space normalization, could be wrong in some cases; improve
-            const getNormalizedText = (txt: Text): string => {
-                const parent = txt.parentElement as HTMLElement;
-                return (txt.textContent || '').includes(parent.innerText)
-                    ? parent.innerText
-                    : (txt.textContent || '').replace(/[\t\n\r ]+/g, ' ');
-            };
-
             parent.elements.push(
                 ...textNodes.map((n: Text) => {
                     r.selectNodeContents(n);
@@ -92,7 +93,9 @@ const parseNodeTree = (node: Node, parent: ElementContainer, root: ElementContai
                         styles,
                         bounds
                     );
-                    auxTextContainer.textNodes.push(new TextContainer(n, styles, [new TextBounds(getNormalizedText(n), bounds)]));
+                    auxTextContainer.textNodes.push(
+                        new TextContainer(n, styles, [new TextBounds(getNormalizedText(n), bounds)])
+                    );
                     return auxTextContainer;
                 })
             );
