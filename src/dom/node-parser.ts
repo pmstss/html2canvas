@@ -130,11 +130,17 @@ const splitByNewLines = (textNode: Text): Text[] => {
         const textNodes = [];
         while (textNode.data.includes('\n')) {
             const idx = textNode.data.indexOf('\n');
-            const secondPart = textNode.splitText(idx + 1);
-            textNodes.push(textNode);
+            // extract '\n' into separate node, not included into result, but major for proper client rect calculations
+            let secondPart = textNode.splitText(idx);
+            secondPart = secondPart.splitText(1);
+            if (textNode.data) {
+                textNodes.push(textNode);
+            }
             textNode = secondPart;
         }
-        textNodes.push(textNode);
+        if (textNode.data) {
+            textNodes.push(textNode);
+        }
         return textNodes;
     }
     return [textNode];
