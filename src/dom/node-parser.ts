@@ -16,36 +16,178 @@ import {Bounds} from '../css/layout/bounds';
 import {TextBounds} from '../css/layout/text';
 
 const LIST_OWNERS = ['OL', 'UL', 'MENU'];
+const EPS = 0.01;
 
-const splitTextByLineWrapsLinear = (textNode: Text, range?: Range): Text[] => {
-    range = range || (textNode.ownerDocument as Document).createRange();
+// TODO: move to options
+const useTextSplitDnc = '*'.charCodeAt(0) === 42; // to avoid trim from dist build
+
+/**
+ * Split text node into multiple text nodes according to visual line wraps
+ * @param textNode Text node to split
+ * @param range pre-created Range
+ * @see splitTextByLineWrapsDnc()
+ */
+const splitTextByLineWrapsLinear = (textNode: Text, range: Range): Text[] => {
     range.selectNodeContents(textNode);
+    if (range.getClientRects().length < 2) {
+        return [textNode];
+    }
 
     const textNodes: Text[] = [];
-    if (range.getClientRects().length > 1) {
-        let i = 0;
-        while (textNode && ++i <= textNode.data.length) {
-            range.setEnd(textNode, i);
-            if (range.getClientRects().length > 1) {
-                textNode = textNode.splitText(i - 1);
-                textNodes.push(textNode.previousSibling as Text);
-                range.selectNodeContents(textNode);
-                i = 0;
-            }
+    let i = 0;
+    while (textNode && ++i <= textNode.data.length) {
+        range.setEnd(textNode, i);
+        if (range.getClientRects().length > 1) {
+            textNode = textNode.splitText(i - 1);
+            textNodes.push(textNode.previousSibling as Text);
+            range.selectNodeContents(textNode);
+            i = 0;
         }
+    }
 
-        if (textNode.data.length) {
-            textNodes.push(textNode);
-        }
-    } else {
-        /*
-          For node that already has single client rect, for properly inherited background color,
-          aux ElementContainer should be created too.
-        */
+    if (textNode.data.length) {
         textNodes.push(textNode);
     }
 
     return textNodes;
+};
+
+/**
+ * Splits text node into multiple nodes with exactly 1 client rectangle (core recursion method)
+ * @param textNode Text node to split
+ * @param range pre-created Range
+ * @see splitTextByLineWrapsDnc()
+ */
+const splitTextIntoSingleRectNodes = (textNode: Text, range: Range): Text[] => {
+    range.selectNodeContents(textNode);
+
+    // this is the most expensive operation, that should be minimized
+    const clientRects = Array.from(range.getClientRects());
+
+    // filtering empty/hidden/etc nodes for proper expectedPartLength
+    const numberOfLines = clientRects.filter(r => r.width > 1 && r.height > 1).length;
+
+    if (numberOfLines < 2) {
+        return [textNode];
+    }
+
+    const textNodes: Text[] = [];
+    // as getClientRects() is expensive, instead of binary split recursive calls,
+    // minimizing its usage by splitting into N parts at once
+    const expectedPartLength = Math.floor(textNode.data.length / numberOfLines);
+    let i = 0;
+    while (++i < numberOfLines) {
+        const secondPart = textNode.splitText(expectedPartLength);
+        textNodes.push(textNode);
+        textNode = secondPart;
+    }
+    textNodes.push(textNode);
+
+    return textNodes.reduce(
+        (res: Text[], subTextNode) => [...res, ...splitTextIntoSingleRectNodes(subTextNode, range)],
+        []
+    );
+};
+
+/**
+ * "Divide and conquer" approach for split by lines wrap in contrast to splitTextByLineWrapsLinear()
+ * @param textNode Text node to split
+ * @param range pre-created Range
+ * @see splitTextByLineWrapsLinear()
+ */
+const splitTextByLineWrapsDnc = (textNode: Text, range: Range): Text[] => {
+    range.selectNodeContents(textNode);
+    if (range.getClientRects().length < 2) {
+        return [textNode];
+    }
+
+    // preprocess for performance reasons
+    let textNodes: Text[] = splitByNewLines(textNode);
+
+    // actual "Divide and conquer" calls
+    textNodes = textNodes.reduce(
+        (res: Text[], subTextNode) => [...res, ...splitTextIntoSingleRectNodes(subTextNode, range)],
+        []
+    );
+
+    // postprocessing: merging single rect nodes into single line nodes
+    textNodes = mergeAdjacentOneLinesNodes(textNodes, range);
+    // postprocessing: between-nodes space normalization
+    moveSpacesToLineEnds(textNodes);
+
+    return textNodes;
+};
+
+/**
+ * Helps to pre-split text node by new lines for further splitTextByLineWrapsDnc() w/o expensive getClientRects() call.
+ * Extra useful for nodes with 'white-space: pre', where new line indeed leads to visual text wrap.
+ *
+ * @param textNode Text node to split
+ * @see splitTextByLineWrapsDnc()
+ */
+const splitByNewLines = (textNode: Text): Text[] => {
+    if (textNode.data.includes('\n')) {
+        const textNodes = [];
+        while (textNode.data.includes('\n')) {
+            const idx = textNode.data.indexOf('\n');
+            const secondPart = textNode.splitText(idx + 1);
+            textNodes.push(textNode);
+            textNode = secondPart;
+        }
+        textNodes.push(textNode);
+        return textNodes;
+    }
+    return [textNode];
+};
+
+/**
+ * Merge adjacent (by x axis) text nodes
+ * @param textNodes Text[] to run merge on
+ * @param range pre-created Range
+ */
+const mergeAdjacentOneLinesNodes = (textNodes: Text[], range: Range): Text[] => {
+    return textNodes.reduce((res: Text[], textNode: Text) => {
+        const prevTextNode = res.length > 0 ? res[res.length - 1] : null;
+        if (prevTextNode) {
+            range.selectNodeContents(prevTextNode);
+            const prevClientRect = range.getClientRects()[0];
+            range.selectNodeContents(textNode);
+            const clientRect = range.getClientRects()[0];
+            if (
+                Math.abs(prevClientRect.x + prevClientRect.width - clientRect.x) < EPS &&
+                Math.abs(prevClientRect.y - clientRect.y) < EPS
+            ) {
+                prevTextNode.appendData(textNode.data);
+                (textNode.parentNode as Node).removeChild(textNode);
+            } else {
+                res.push(textNode);
+            }
+        } else {
+            res.push(textNode);
+        }
+
+        return res;
+    }, []);
+};
+
+/**
+ * "Normalize" spacing in adjacent per-line text nodes by moving them from line start to line end
+ * @param textNodes Text[] to "normalize"
+ */
+const moveSpacesToLineEnds = (textNodes: Text[]): void => {
+    textNodes.forEach((textNode: Text, idx: number) => {
+        if (idx > 0) {
+            let spacePrefix = null;
+            textNode.data = textNode.data.replace(/^\s+/, (token: string) => {
+                spacePrefix = token;
+                return '';
+            });
+
+            if (spacePrefix) {
+                textNodes[idx - 1].appendData(spacePrefix);
+            }
+        }
+    });
 };
 
 // TODO: trivial space normalization, could be wrong in some cases; improve
@@ -67,8 +209,10 @@ const parseNodeTree = (node: Node, parent: ElementContainer, root: ElementContai
               Workaround: split text node into single-rect text nodes with putting each one into aux ElementContainer,
               that inherits background props (color, etc) from parent node.
             */
-            const r = (node.ownerDocument as Document).createRange();
-            const textNodes = splitTextByLineWrapsLinear(childNode, r);
+            const range = (node.ownerDocument as Document).createRange();
+            const textNodes = useTextSplitDnc
+                ? splitTextByLineWrapsDnc(childNode, range)
+                : splitTextByLineWrapsLinear(childNode, range);
 
             const styles = new CSSParsedDeclaration(window.getComputedStyle(node as Element, null));
             /*
@@ -85,8 +229,8 @@ const parseNodeTree = (node: Node, parent: ElementContainer, root: ElementContai
 
             parent.elements.push(
                 ...textNodes.map((n: Text) => {
-                    r.selectNodeContents(n);
-                    const bounds = Bounds.fromClientRect(r.getBoundingClientRect());
+                    range.selectNodeContents(n);
+                    const bounds = Bounds.fromClientRect(range.getBoundingClientRect());
                     const auxTextContainer = new ElementContainer(
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         (null as any) as Element,
