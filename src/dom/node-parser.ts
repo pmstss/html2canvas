@@ -59,29 +59,39 @@ const splitTextByLineWrapsLinear = (textNode: Text, range: Range): Text[] => {
  * @see splitTextByLineWrapsDnc()
  */
 const splitTextIntoSingleRectNodes = (textNode: Text, range: Range): Text[] => {
+    if (!textNode.data) {
+        return [];
+    }
+
     range.selectNodeContents(textNode);
 
     // this is the most expensive operation, that should be minimized
     const clientRects = Array.from(range.getClientRects());
 
     // filtering empty/hidden/etc nodes for proper expectedPartLength
-    const numberOfLines = clientRects.filter(r => r.width > 1 && r.height > 1).length;
+    const numberOfRects = clientRects.length;
+    const numberOfLines = Math.max(1, clientRects.filter(r => r.width > 1 && r.height > 1).length);
 
-    if (numberOfLines < 2) {
+    if (numberOfRects < 2) {
         return [textNode];
     }
 
     const textNodes: Text[] = [];
     // as getClientRects() is expensive, instead of binary split recursive calls,
     // minimizing its usage by splitting into N parts at once
-    const expectedPartLength = Math.floor(textNode.data.length / numberOfLines);
+    const numberOfParts = Math.max(2, numberOfLines);
+    const expectedPartLength = Math.floor(textNode.data.length / numberOfParts);
     let i = 0;
-    while (++i < numberOfLines) {
+    while (++i < numberOfParts) {
         const secondPart = textNode.splitText(expectedPartLength);
-        textNodes.push(textNode);
+        if (textNode.data) {
+            textNodes.push(textNode);
+        }
         textNode = secondPart;
     }
-    textNodes.push(textNode);
+    if (textNode.data) {
+        textNodes.push(textNode);
+    }
 
     return textNodes.reduce(
         (res: Text[], subTextNode) => [...res, ...splitTextIntoSingleRectNodes(subTextNode, range)],
