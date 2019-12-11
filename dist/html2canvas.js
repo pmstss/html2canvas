@@ -4474,6 +4474,27 @@
     // TODO: move to options
     var useTextSplitDnc = '*'.charCodeAt(0) === 42; // to avoid trim from dist build
     /**
+     * Custom getClientRects() implementation with combining adjacent rects
+     * @param range source of client rects
+     */
+    var getClientRects = function (range) {
+        return Array.from(range.getClientRects()).reduce(function (res, rect) {
+            if (res.length > 0) {
+                var prevRect = res[res.length - 1];
+                if (Math.abs(prevRect.x + prevRect.width - rect.x) < EPS && Math.abs(prevRect.y - rect.y) < EPS) {
+                    prevRect.width += rect.width;
+                }
+                else {
+                    res.push(rect);
+                }
+            }
+            else {
+                res.push(rect);
+            }
+            return res;
+        }, []);
+    };
+    /**
      * Split text node into multiple text nodes according to visual line wraps
      * @param textNode Text node to split
      * @param range pre-created Range
@@ -4481,14 +4502,14 @@
      */
     var splitTextByLineWrapsLinear = function (textNode, range) {
         range.selectNodeContents(textNode);
-        if (range.getClientRects().length < 2) {
+        if (getClientRects(range).length < 2) {
             return [textNode];
         }
         var textNodes = [];
         var i = 0;
         while (textNode && ++i <= textNode.data.length) {
             range.setEnd(textNode, i);
-            if (range.getClientRects().length > 1) {
+            if (getClientRects(range).length > 1) {
                 textNode = textNode.splitText(i - 1);
                 textNodes.push(textNode.previousSibling);
                 range.selectNodeContents(textNode);
@@ -4512,7 +4533,7 @@
         }
         range.selectNodeContents(textNode);
         // this is the most expensive operation, that should be minimized
-        var clientRects = Array.from(range.getClientRects());
+        var clientRects = getClientRects(range);
         // filtering empty/hidden/etc nodes for proper expectedPartLength
         var numberOfRects = clientRects.length;
         var numberOfLines = Math.max(1, clientRects.filter(function (r) { return r.width > 1 && r.height > 1; }).length);
@@ -4545,7 +4566,7 @@
      */
     var splitTextByLineWrapsDnc = function (textNode, range) {
         range.selectNodeContents(textNode);
-        if (range.getClientRects().length < 2) {
+        if (getClientRects(range).length < 2) {
             return [textNode];
         }
         // preprocess for performance reasons
@@ -4595,9 +4616,10 @@
             var prevTextNode = res.length > 0 ? res[res.length - 1] : null;
             if (prevTextNode) {
                 range.selectNodeContents(prevTextNode);
-                var prevClientRect = range.getClientRects()[0];
+                var tmpRects = getClientRects(range);
+                var prevClientRect = tmpRects[tmpRects.length - 1];
                 range.selectNodeContents(textNode);
-                var clientRect = range.getClientRects()[0];
+                var clientRect = getClientRects(range)[0];
                 if (Math.abs(prevClientRect.x + prevClientRect.width - clientRect.x) < EPS &&
                     Math.abs(prevClientRect.y - clientRect.y) < EPS) {
                     prevTextNode.appendData(textNode.data);

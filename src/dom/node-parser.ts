@@ -22,6 +22,27 @@ const EPS = 0.01;
 const useTextSplitDnc = '*'.charCodeAt(0) === 42; // to avoid trim from dist build
 
 /**
+ * Custom getClientRects() implementation with combining adjacent rects
+ * @param range source of client rects
+ */
+const getClientRects = (range: Range): DOMRect[] => {
+    return Array.from(range.getClientRects()).reduce((res: DOMRect[], rect: DOMRect) => {
+        if (res.length > 0) {
+            const prevRect: DOMRect = res[res.length - 1];
+            if (Math.abs(prevRect.x + prevRect.width - rect.x) < EPS && Math.abs(prevRect.y - rect.y) < EPS) {
+                prevRect.width += rect.width;
+            } else {
+                res.push(rect);
+            }
+        } else {
+            res.push(rect);
+        }
+
+        return res;
+    }, []);
+};
+
+/**
  * Split text node into multiple text nodes according to visual line wraps
  * @param textNode Text node to split
  * @param range pre-created Range
@@ -29,7 +50,7 @@ const useTextSplitDnc = '*'.charCodeAt(0) === 42; // to avoid trim from dist bui
  */
 const splitTextByLineWrapsLinear = (textNode: Text, range: Range): Text[] => {
     range.selectNodeContents(textNode);
-    if (range.getClientRects().length < 2) {
+    if (getClientRects(range).length < 2) {
         return [textNode];
     }
 
@@ -37,7 +58,7 @@ const splitTextByLineWrapsLinear = (textNode: Text, range: Range): Text[] => {
     let i = 0;
     while (textNode && ++i <= textNode.data.length) {
         range.setEnd(textNode, i);
-        if (range.getClientRects().length > 1) {
+        if (getClientRects(range).length > 1) {
             textNode = textNode.splitText(i - 1);
             textNodes.push(textNode.previousSibling as Text);
             range.selectNodeContents(textNode);
@@ -66,7 +87,7 @@ const splitTextIntoSingleRectNodes = (textNode: Text, range: Range): Text[] => {
     range.selectNodeContents(textNode);
 
     // this is the most expensive operation, that should be minimized
-    const clientRects = Array.from(range.getClientRects());
+    const clientRects = getClientRects(range);
 
     // filtering empty/hidden/etc nodes for proper expectedPartLength
     const numberOfRects = clientRects.length;
@@ -107,7 +128,7 @@ const splitTextIntoSingleRectNodes = (textNode: Text, range: Range): Text[] => {
  */
 const splitTextByLineWrapsDnc = (textNode: Text, range: Range): Text[] => {
     range.selectNodeContents(textNode);
-    if (range.getClientRects().length < 2) {
+    if (getClientRects(range).length < 2) {
         return [textNode];
     }
 
@@ -166,9 +187,10 @@ const mergeAdjacentOneLinesNodes = (textNodes: Text[], range: Range): Text[] => 
         const prevTextNode = res.length > 0 ? res[res.length - 1] : null;
         if (prevTextNode) {
             range.selectNodeContents(prevTextNode);
-            const prevClientRect = range.getClientRects()[0];
+            const tmpRects = getClientRects(range);
+            const prevClientRect = tmpRects[tmpRects.length - 1];
             range.selectNodeContents(textNode);
-            const clientRect = range.getClientRects()[0];
+            const clientRect = getClientRects(range)[0];
             if (
                 Math.abs(prevClientRect.x + prevClientRect.width - clientRect.x) < EPS &&
                 Math.abs(prevClientRect.y - clientRect.y) < EPS
