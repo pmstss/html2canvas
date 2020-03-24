@@ -31,6 +31,7 @@ export interface RenderOptions {
         width: number;
         height: number;
     }) => void;
+    shouldStopCallback?: () => boolean;
 }
 export declare class CanvasRenderer {
     canvas: HTMLCanvasElement;
@@ -42,14 +43,14 @@ export declare class CanvasRenderer {
     applyEffects(effects: IElementEffect[], target: EffectTarget): void;
     applyEffect(effect: IElementEffect): void;
     popEffect(): void;
-    renderStack(stack: StackingContext): Promise<void>;
+    renderStack(stack: StackingContext, root?: boolean): Promise<void>;
     renderNode(paint: ElementPaint): Promise<void>;
     renderTextWithLetterSpacing(text: TextBounds, letterSpacing: number): void;
     private createFontStyle;
     renderTextNode(text: TextContainer, styles: CSSParsedDeclaration): Promise<void>;
     renderReplacedElement(container: ReplacedElementContainer, _curves: BoundCurves, image: HTMLImageElement | HTMLCanvasElement): void;
     renderNodeContent(paint: ElementPaint): Promise<void>;
-    renderStackContent(stack: StackingContext): Promise<void>;
+    renderStackContent(stack: StackingContext, root: boolean): Promise<void>;
     mask(paths: Path[]): void;
     path(paths: Path[]): void;
     formatPath(paths: Path[]): void;

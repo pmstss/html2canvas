@@ -157,7 +157,8 @@ var renderElement = function (element, opts) { return __awaiter(void 0, void 0, 
                     height: options.height,
                     windowWidth: options.windowWidth,
                     windowHeight: options.windowHeight,
-                    linkCallback: options.linkCallback
+                    linkCallback: options.linkCallback,
+                    shouldStopCallback: options.shouldStopCallback
                 };
                 if (!options.foreignObjectRendering) return [3 /*break*/, 5];
                 logger_1.Logger.getInstance(instanceName).debug("Document cloned, using foreign object rendering");

@@ -135,7 +135,8 @@ const renderElement = async (element: HTMLElement, opts: Partial<Options>): Prom
         height: options.height,
         windowWidth: options.windowWidth,
         windowHeight: options.windowHeight,
-        linkCallback: options.linkCallback
+        linkCallback: options.linkCallback,
+        shouldStopCallback: options.shouldStopCallback
     };
 
     let canvas;

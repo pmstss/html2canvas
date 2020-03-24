@@ -113,7 +113,8 @@ var CanvasRenderer = /** @class */ (function () {
         this._activeEffects.pop();
         this.ctx.restore();
     };
-    CanvasRenderer.prototype.renderStack = function (stack) {
+    CanvasRenderer.prototype.renderStack = function (stack, root) {
+        if (root === void 0) { root = false; }
         return __awaiter(this, void 0, void 0, function () {
             var styles;
             return __generator(this, function (_a) {
@@ -122,7 +123,7 @@ var CanvasRenderer = /** @class */ (function () {
                         styles = stack.element.container.styles;
                         if (!styles.isVisible()) return [3 /*break*/, 2];
                         this.ctx.globalAlpha = styles.opacity;
-                        return [4 /*yield*/, this.renderStackContent(stack)];
+                        return [4 /*yield*/, this.renderStackContent(stack, root)];
                     case 1:
                         _a.sent();
                         _a.label = 2;
@@ -417,15 +418,31 @@ var CanvasRenderer = /** @class */ (function () {
             });
         });
     };
-    CanvasRenderer.prototype.renderStackContent = function (stack) {
+    CanvasRenderer.prototype.renderStackContent = function (stack, root) {
         return __awaiter(this, void 0, void 0, function () {
-            var _i, _a, child, _b, _c, child, _d, _e, child, _f, _g, child, _h, _j, child, _k, _l, child, _m, _o, child;
+            var shouldStop, _i, _a, child, _b, _c, child, _d, _e, child, _f, _g, child, _h, _j, child, _k, _l, child, _m, _o, child;
+            var _this = this;
             return __generator(this, function (_p) {
                 switch (_p.label) {
-                    case 0: 
-                    // https://www.w3.org/TR/css-position-3/#painting-order
-                    // 1. the background and borders of the element forming the stacking context.
-                    return [4 /*yield*/, this.renderNodeBackgroundAndBorders(stack.element)];
+                    case 0:
+                        shouldStop = function () { return __awaiter(_this, void 0, void 0, function () {
+                            var res;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        res = this.options.shouldStopCallback && this.options.shouldStopCallback();
+                                        if (!root) return [3 /*break*/, 2];
+                                        return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, 0); })];
+                                    case 1:
+                                        _a.sent();
+                                        _a.label = 2;
+                                    case 2: return [2 /*return*/, res];
+                                }
+                            });
+                        }); };
+                        // https://www.w3.org/TR/css-position-3/#painting-order
+                        // 1. the background and borders of the element forming the stacking context.
+                        return [4 /*yield*/, this.renderNodeBackgroundAndBorders(stack.element)];
                     case 1:
                         // https://www.w3.org/TR/css-position-3/#painting-order
                         // 1. the background and borders of the element forming the stacking context.
@@ -433,99 +450,158 @@ var CanvasRenderer = /** @class */ (function () {
                         _i = 0, _a = stack.negativeZIndex;
                         _p.label = 2;
                     case 2:
-                        if (!(_i < _a.length)) return [3 /*break*/, 5];
+                        if (!(_i < _a.length)) return [3 /*break*/, 6];
                         child = _a[_i];
-                        return [4 /*yield*/, this.renderStack(child)];
+                        return [4 /*yield*/, shouldStop()];
                     case 3:
-                        _p.sent();
-                        _p.label = 4;
+                        if (_p.sent()) {
+                            return [3 /*break*/, 6];
+                        }
+                        return [4 /*yield*/, this.renderStack(child)];
                     case 4:
+                        _p.sent();
+                        _p.label = 5;
+                    case 5:
                         _i++;
                         return [3 /*break*/, 2];
-                    case 5: 
-                    // 3. For all its in-flow, non-positioned, block-level descendants in tree order:
-                    return [4 /*yield*/, this.renderNodeContent(stack.element)];
-                    case 6:
+                    case 6: return [4 /*yield*/, shouldStop()];
+                    case 7:
+                        if (_p.sent()) {
+                            return [2 /*return*/];
+                        }
+                        // 3. For all its in-flow, non-positioned, block-level descendants in tree order:
+                        return [4 /*yield*/, this.renderNodeContent(stack.element)];
+                    case 8:
                         // 3. For all its in-flow, non-positioned, block-level descendants in tree order:
                         _p.sent();
                         _b = 0, _c = stack.nonInlineLevel;
-                        _p.label = 7;
-                    case 7:
-                        if (!(_b < _c.length)) return [3 /*break*/, 10];
-                        child = _c[_b];
-                        return [4 /*yield*/, this.renderNode(child)];
-                    case 8:
-                        _p.sent();
                         _p.label = 9;
                     case 9:
-                        _b++;
-                        return [3 /*break*/, 7];
+                        if (!(_b < _c.length)) return [3 /*break*/, 13];
+                        child = _c[_b];
+                        return [4 /*yield*/, shouldStop()];
                     case 10:
-                        _d = 0, _e = stack.nonPositionedFloats;
-                        _p.label = 11;
+                        if (_p.sent()) {
+                            return [3 /*break*/, 13];
+                        }
+                        return [4 /*yield*/, this.renderNode(child)];
                     case 11:
-                        if (!(_d < _e.length)) return [3 /*break*/, 14];
-                        child = _e[_d];
-                        return [4 /*yield*/, this.renderStack(child)];
-                    case 12:
                         _p.sent();
-                        _p.label = 13;
-                    case 13:
-                        _d++;
-                        return [3 /*break*/, 11];
+                        _p.label = 12;
+                    case 12:
+                        _b++;
+                        return [3 /*break*/, 9];
+                    case 13: return [4 /*yield*/, shouldStop()];
                     case 14:
-                        _f = 0, _g = stack.nonPositionedInlineLevel;
+                        if (_p.sent()) {
+                            return [2 /*return*/];
+                        }
+                        _d = 0, _e = stack.nonPositionedFloats;
                         _p.label = 15;
                     case 15:
-                        if (!(_f < _g.length)) return [3 /*break*/, 18];
-                        child = _g[_f];
-                        return [4 /*yield*/, this.renderStack(child)];
+                        if (!(_d < _e.length)) return [3 /*break*/, 19];
+                        child = _e[_d];
+                        return [4 /*yield*/, shouldStop()];
                     case 16:
-                        _p.sent();
-                        _p.label = 17;
+                        if (_p.sent()) {
+                            return [3 /*break*/, 19];
+                        }
+                        return [4 /*yield*/, this.renderStack(child)];
                     case 17:
-                        _f++;
-                        return [3 /*break*/, 15];
-                    case 18:
-                        _h = 0, _j = stack.inlineLevel;
-                        _p.label = 19;
-                    case 19:
-                        if (!(_h < _j.length)) return [3 /*break*/, 22];
-                        child = _j[_h];
-                        return [4 /*yield*/, this.renderNode(child)];
-                    case 20:
                         _p.sent();
+                        _p.label = 18;
+                    case 18:
+                        _d++;
+                        return [3 /*break*/, 15];
+                    case 19: return [4 /*yield*/, shouldStop()];
+                    case 20:
+                        if (_p.sent()) {
+                            return [2 /*return*/];
+                        }
+                        _f = 0, _g = stack.nonPositionedInlineLevel;
                         _p.label = 21;
                     case 21:
-                        _h++;
-                        return [3 /*break*/, 19];
+                        if (!(_f < _g.length)) return [3 /*break*/, 25];
+                        child = _g[_f];
+                        return [4 /*yield*/, shouldStop()];
                     case 22:
-                        _k = 0, _l = stack.zeroOrAutoZIndexOrTransformedOrOpacity;
-                        _p.label = 23;
-                    case 23:
-                        if (!(_k < _l.length)) return [3 /*break*/, 26];
-                        child = _l[_k];
+                        if (_p.sent()) {
+                            return [3 /*break*/, 25];
+                        }
                         return [4 /*yield*/, this.renderStack(child)];
-                    case 24:
+                    case 23:
                         _p.sent();
-                        _p.label = 25;
-                    case 25:
-                        _k++;
-                        return [3 /*break*/, 23];
+                        _p.label = 24;
+                    case 24:
+                        _f++;
+                        return [3 /*break*/, 21];
+                    case 25: return [4 /*yield*/, shouldStop()];
                     case 26:
-                        _m = 0, _o = stack.positiveZIndex;
+                        if (_p.sent()) {
+                            return [2 /*return*/];
+                        }
+                        _h = 0, _j = stack.inlineLevel;
                         _p.label = 27;
                     case 27:
-                        if (!(_m < _o.length)) return [3 /*break*/, 30];
-                        child = _o[_m];
-                        return [4 /*yield*/, this.renderStack(child)];
+                        if (!(_h < _j.length)) return [3 /*break*/, 31];
+                        child = _j[_h];
+                        return [4 /*yield*/, shouldStop()];
                     case 28:
-                        _p.sent();
-                        _p.label = 29;
+                        if (_p.sent()) {
+                            return [3 /*break*/, 31];
+                        }
+                        return [4 /*yield*/, this.renderNode(child)];
                     case 29:
-                        _m++;
+                        _p.sent();
+                        _p.label = 30;
+                    case 30:
+                        _h++;
                         return [3 /*break*/, 27];
-                    case 30: return [2 /*return*/];
+                    case 31: return [4 /*yield*/, shouldStop()];
+                    case 32:
+                        if (_p.sent()) {
+                            return [2 /*return*/];
+                        }
+                        _k = 0, _l = stack.zeroOrAutoZIndexOrTransformedOrOpacity;
+                        _p.label = 33;
+                    case 33:
+                        if (!(_k < _l.length)) return [3 /*break*/, 37];
+                        child = _l[_k];
+                        return [4 /*yield*/, shouldStop()];
+                    case 34:
+                        if (_p.sent()) {
+                            return [3 /*break*/, 37];
+                        }
+                        return [4 /*yield*/, this.renderStack(child)];
+                    case 35:
+                        _p.sent();
+                        _p.label = 36;
+                    case 36:
+                        _k++;
+                        return [3 /*break*/, 33];
+                    case 37: return [4 /*yield*/, shouldStop()];
+                    case 38:
+                        if (_p.sent()) {
+                            return [2 /*return*/];
+                        }
+                        _m = 0, _o = stack.positiveZIndex;
+                        _p.label = 39;
+                    case 39:
+                        if (!(_m < _o.length)) return [3 /*break*/, 43];
+                        child = _o[_m];
+                        return [4 /*yield*/, shouldStop()];
+                    case 40:
+                        if (_p.sent()) {
+                            return [3 /*break*/, 43];
+                        }
+                        return [4 /*yield*/, this.renderStack(child)];
+                    case 41:
+                        _p.sent();
+                        _p.label = 42;
+                    case 42:
+                        _m++;
+                        return [3 /*break*/, 39];
+                    case 43: return [2 /*return*/];
                 }
             });
         });
@@ -793,9 +869,15 @@ var CanvasRenderer = /** @class */ (function () {
                             this.ctx.fillRect(this.options.x - this.options.scrollX, this.options.y - this.options.scrollY, this.options.width, this.options.height);
                         }
                         stack = stacking_context_1.parseStackingContexts(element);
-                        return [4 /*yield*/, this.renderStack(stack)];
+                        if (this.options.shouldStopCallback && this.options.shouldStopCallback()) {
+                            return [2 /*return*/, this.canvas];
+                        }
+                        return [4 /*yield*/, this.renderStack(stack, true)];
                     case 1:
                         _a.sent();
+                        if (this.options.shouldStopCallback && this.options.shouldStopCallback()) {
+                            return [2 /*return*/, this.canvas];
+                        }
                         this.applyEffects([], 2 /* BACKGROUND_BORDERS */);
                         return [2 /*return*/, this.canvas];
                 }

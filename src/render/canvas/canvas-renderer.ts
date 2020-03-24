@@ -58,6 +58,7 @@ export interface RenderOptions {
     windowHeight: number;
     cache: Cache;
     linkCallback?: (href: string, bounds: {left: number; top: number; width: number; height: number}) => void;
+    shouldStopCallback?: () => boolean;
 }
 
 const MASK_OFFSET = 10000;
@@ -127,11 +128,11 @@ export class CanvasRenderer {
         this.ctx.restore();
     }
 
-    async renderStack(stack: StackingContext) {
+    async renderStack(stack: StackingContext, root = false) {
         const styles = stack.element.container.styles;
         if (styles.isVisible()) {
             this.ctx.globalAlpha = styles.opacity;
-            await this.renderStackContent(stack);
+            await this.renderStackContent(stack, root);
         }
     }
 
@@ -440,34 +441,80 @@ export class CanvasRenderer {
         }
     }
 
-    async renderStackContent(stack: StackingContext) {
+    async renderStackContent(stack: StackingContext, root: boolean) {
+        const shouldStop = async () => {
+            const res = this.options.shouldStopCallback && this.options.shouldStopCallback();
+            if (root) {
+                await new Promise(r => setTimeout(r, 0));
+            }
+            return res;
+        };
+
         // https://www.w3.org/TR/css-position-3/#painting-order
         // 1. the background and borders of the element forming the stacking context.
         await this.renderNodeBackgroundAndBorders(stack.element);
+
         // 2. the child stacking contexts with negative stack levels (most negative first).
         for (const child of stack.negativeZIndex) {
+            if (await shouldStop()) {
+                break;
+            }
+
             await this.renderStack(child);
         }
+        if (await shouldStop()) {
+            return;
+        }
+
         // 3. For all its in-flow, non-positioned, block-level descendants in tree order:
         await this.renderNodeContent(stack.element);
 
         for (const child of stack.nonInlineLevel) {
+            if (await shouldStop()) {
+                break;
+            }
+
             await this.renderNode(child);
         }
+        if (await shouldStop()) {
+            return;
+        }
+
         // 4. All non-positioned floating descendants, in tree order. For each one of these,
         // treat the element as if it created a new stacking context, but any positioned descendants and descendants
         // which actually create a new stacking context should be considered part of the parent stacking context,
         // not this new one.
         for (const child of stack.nonPositionedFloats) {
+            if (await shouldStop()) {
+                break;
+            }
             await this.renderStack(child);
         }
+        if (await shouldStop()) {
+            return;
+        }
+
         // 5. the in-flow, inline-level, non-positioned descendants, including inline tables and inline blocks.
         for (const child of stack.nonPositionedInlineLevel) {
+            if (await shouldStop()) {
+                break;
+            }
             await this.renderStack(child);
         }
+        if (await shouldStop()) {
+            return;
+        }
+
         for (const child of stack.inlineLevel) {
+            if (await shouldStop()) {
+                break;
+            }
             await this.renderNode(child);
         }
+        if (await shouldStop()) {
+            return;
+        }
+
         // 6. All positioned, opacity or transform descendants, in tree order that fall into the following categories:
         //  All positioned descendants with 'z-index: auto' or 'z-index: 0', in tree order.
         //  For those with 'z-index: auto', treat the element as if it created a new stacking context,
@@ -479,11 +526,21 @@ export class CanvasRenderer {
         //
         //  All transform descendants with transform other than none
         for (const child of stack.zeroOrAutoZIndexOrTransformedOrOpacity) {
+            if (await shouldStop()) {
+                break;
+            }
             await this.renderStack(child);
         }
+        if (await shouldStop()) {
+            return;
+        }
+
         // 7. Stacking contexts formed by positioned descendants with z-indices greater than or equal to 1 in z-index
         // order (smallest first) then tree order.
         for (const child of stack.positiveZIndex) {
+            if (await shouldStop()) {
+                break;
+            }
             await this.renderStack(child);
         }
     }
@@ -729,8 +786,15 @@ export class CanvasRenderer {
         }
 
         const stack = parseStackingContexts(element);
+        if (this.options.shouldStopCallback && this.options.shouldStopCallback()) {
+            return this.canvas;
+        }
 
-        await this.renderStack(stack);
+        await this.renderStack(stack, true);
+        if (this.options.shouldStopCallback && this.options.shouldStopCallback()) {
+            return this.canvas;
+        }
+
         this.applyEffects([], EffectTarget.BACKGROUND_BORDERS);
         return this.canvas;
     }
