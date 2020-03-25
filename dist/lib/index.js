@@ -107,7 +107,9 @@ const renderElement = async (element, opts) => {
         linkCallback: options.linkCallback,
         shouldStopCallback: options.shouldStopCallback,
         shouldStopOnInner: options.shouldStopOnInner,
-        shouldStopTimeframe: options.shouldStopTimeframe
+        shouldStopTimeframe: options.shouldStopTimeframe,
+        nodeProgressClassName: options.nodeProgressClassName,
+        nodeProgressCallback: options.nodeProgressCallback
     };
     let canvas;
     if (options.foreignObjectRendering) {

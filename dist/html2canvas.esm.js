@@ -4018,6 +4018,7 @@ class ElementContainer {
         }
         this.bounds = bounds || parseBounds(element);
         this.flags = 0;
+        this.className = element ? element.className : '';
     }
 }
 
@@ -6157,6 +6158,11 @@ class CanvasRenderer {
         }
     }
     async renderNode(paint) {
+        if (this.options.nodeProgressClassName &&
+            this.options.nodeProgressCallback &&
+            paint.container.className.includes(this.options.nodeProgressClassName)) {
+            await this.options.nodeProgressCallback();
+        }
         if (paint.container.styles.isVisible()) {
             await this.renderNodeBackgroundAndBorders(paint);
             await this.renderNodeContent(paint);
@@ -6853,7 +6859,9 @@ const renderElement = async (element, opts) => {
         linkCallback: options.linkCallback,
         shouldStopCallback: options.shouldStopCallback,
         shouldStopOnInner: options.shouldStopOnInner,
-        shouldStopTimeframe: options.shouldStopTimeframe
+        shouldStopTimeframe: options.shouldStopTimeframe,
+        nodeProgressClassName: options.nodeProgressClassName,
+        nodeProgressCallback: options.nodeProgressCallback
     };
     let canvas;
     if (options.foreignObjectRendering) {

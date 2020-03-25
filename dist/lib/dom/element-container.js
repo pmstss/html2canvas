@@ -14,6 +14,7 @@ class ElementContainer {
         }
         this.bounds = bounds || bounds_1.parseBounds(element);
         this.flags = 0;
+        this.className = element ? element.className : '';
     }
 }
 exports.ElementContainer = ElementContainer;

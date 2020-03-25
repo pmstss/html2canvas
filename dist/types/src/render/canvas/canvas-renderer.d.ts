@@ -34,6 +34,8 @@ export interface RenderOptions {
     shouldStopCallback?: () => boolean;
     shouldStopOnInner?: boolean;
     shouldStopTimeframe?: number;
+    nodeProgressClassName?: string;
+    nodeProgressCallback?: () => void;
 }
 export declare class CanvasRenderer {
     canvas: HTMLCanvasElement;

@@ -10,6 +10,7 @@ export const enum FLAGS {
 }
 
 export class ElementContainer {
+    readonly className: string;
     readonly styles: CSSParsedDeclaration;
     readonly textNodes: TextContainer[];
     readonly elements: ElementContainer[];
@@ -26,5 +27,6 @@ export class ElementContainer {
         }
         this.bounds = bounds || parseBounds(element);
         this.flags = 0;
+        this.className = element ? element.className : '';
     }
 }

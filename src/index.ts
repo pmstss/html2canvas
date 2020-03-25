@@ -138,7 +138,9 @@ const renderElement = async (element: HTMLElement, opts: Partial<Options>): Prom
         linkCallback: options.linkCallback,
         shouldStopCallback: options.shouldStopCallback,
         shouldStopOnInner: options.shouldStopOnInner,
-        shouldStopTimeframe: options.shouldStopTimeframe
+        shouldStopTimeframe: options.shouldStopTimeframe,
+        nodeProgressClassName: options.nodeProgressClassName,
+        nodeProgressCallback: options.nodeProgressCallback
     };
 
     let canvas;

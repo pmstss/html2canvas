@@ -61,6 +61,8 @@ export interface RenderOptions {
     shouldStopCallback?: () => boolean;
     shouldStopOnInner?: boolean;
     shouldStopTimeframe?: number;
+    nodeProgressClassName?: string;
+    nodeProgressCallback?: () => void;
 }
 
 const MASK_OFFSET = 10000;
@@ -139,6 +141,13 @@ export class CanvasRenderer {
     }
 
     async renderNode(paint: ElementPaint) {
+        if (
+            this.options.nodeProgressClassName &&
+            this.options.nodeProgressCallback &&
+            paint.container.className.includes(this.options.nodeProgressClassName)
+        ) {
+            await this.options.nodeProgressCallback();
+        }
         if (paint.container.styles.isVisible()) {
             await this.renderNodeBackgroundAndBorders(paint);
             await this.renderNodeContent(paint);

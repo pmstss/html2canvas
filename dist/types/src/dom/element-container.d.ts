@@ -7,6 +7,7 @@ export declare const enum FLAGS {
     IS_LIST_OWNER = 8
 }
 export declare class ElementContainer {
+    readonly className: string;
     readonly styles: CSSParsedDeclaration;
     readonly textNodes: TextContainer[];
     readonly elements: ElementContainer[];
