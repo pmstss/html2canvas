@@ -1,18 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var Logger = /** @class */ (function () {
-    function Logger() {
-    }
-    Logger.prototype.debug = function () { };
-    Logger.create = function () { };
-    Logger.destroy = function () { };
-    Logger.getInstance = function () {
+class Logger {
+    debug() { }
+    static create() { }
+    static destroy() { }
+    static getInstance() {
         return logger;
-    };
-    Logger.prototype.info = function () { };
-    Logger.prototype.error = function () { };
-    return Logger;
-}());
+    }
+    info() { }
+    error() { }
+}
 exports.Logger = Logger;
-var logger = new Logger();
+const logger = new Logger();
 //# sourceMappingURL=logger.js.map

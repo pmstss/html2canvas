@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.invariant = function (assertion, error) {
+exports.invariant = (assertion, error) => {
     if (!assertion) {
         console.error(error);
     }

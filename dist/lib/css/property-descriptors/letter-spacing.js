@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var IPropertyDescriptor_1 = require("../IPropertyDescriptor");
-var tokenizer_1 = require("../syntax/tokenizer");
+const IPropertyDescriptor_1 = require("../IPropertyDescriptor");
+const tokenizer_1 = require("../syntax/tokenizer");
 exports.letterSpacing = {
     name: 'letter-spacing',
     initialValue: '0',
     prefix: false,
     type: IPropertyDescriptor_1.PropertyDescriptorParsingType.VALUE,
-    parse: function (token) {
+    parse: (token) => {
         if (token.type === tokenizer_1.TokenType.IDENT_TOKEN && token.value === 'normal') {
             return 0;
         }

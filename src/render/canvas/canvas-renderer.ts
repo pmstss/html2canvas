@@ -59,6 +59,8 @@ export interface RenderOptions {
     cache: Cache;
     linkCallback?: (href: string, bounds: {left: number; top: number; width: number; height: number}) => void;
     shouldStopCallback?: () => boolean;
+    shouldStopOnInner?: boolean;
+    shouldStopTimeframe?: number;
 }
 
 const MASK_OFFSET = 10000;
@@ -442,12 +444,28 @@ export class CanvasRenderer {
     }
 
     async renderStackContent(stack: StackingContext, root: boolean) {
+        const stopEnabled = this.options.shouldStopCallback && (this.options.shouldStopOnInner || root);
+        const timeframe = typeof this.options.shouldStopTimeframe === 'number' ? this.options.shouldStopTimeframe : 200;
+
+        let lastCall = Date.now();
         const shouldStop = async () => {
+            if (!stopEnabled) {
+                return false;
+            }
+
             const res = this.options.shouldStopCallback && this.options.shouldStopCallback();
-            if (root) {
+            if (res) {
+                return true;
+            }
+
+            // for main thread throttle
+            const currentCall = Date.now();
+            if (root && currentCall - lastCall > timeframe) {
                 await new Promise(r => setTimeout(r, 0));
             }
-            return res;
+            lastCall = currentCall;
+
+            return false;
         };
 
         // https://www.w3.org/TR/css-position-3/#painting-order

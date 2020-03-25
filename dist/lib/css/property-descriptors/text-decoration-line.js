@@ -1,16 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var IPropertyDescriptor_1 = require("../IPropertyDescriptor");
-var parser_1 = require("../syntax/parser");
+const IPropertyDescriptor_1 = require("../IPropertyDescriptor");
+const parser_1 = require("../syntax/parser");
 exports.textDecorationLine = {
     name: 'text-decoration-line',
     initialValue: 'none',
     prefix: false,
     type: IPropertyDescriptor_1.PropertyDescriptorParsingType.LIST,
-    parse: function (tokens) {
+    parse: (tokens) => {
         return tokens
             .filter(parser_1.isIdentToken)
-            .map(function (token) {
+            .map(token => {
             switch (token.value) {
                 case 'underline':
                     return 1 /* UNDERLINE */;
@@ -23,7 +23,7 @@ exports.textDecorationLine = {
             }
             return 0 /* NONE */;
         })
-            .filter(function (line) { return line !== 0 /* NONE */; });
+            .filter(line => line !== 0 /* NONE */);
     }
 };
 //# sourceMappingURL=text-decoration-line.js.map

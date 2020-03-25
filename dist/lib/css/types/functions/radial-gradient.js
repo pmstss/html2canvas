@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var parser_1 = require("../../syntax/parser");
-var image_1 = require("../image");
-var gradient_1 = require("./gradient");
-var length_percentage_1 = require("../length-percentage");
-var length_1 = require("../length");
+const parser_1 = require("../../syntax/parser");
+const image_1 = require("../image");
+const gradient_1 = require("./gradient");
+const length_percentage_1 = require("../length-percentage");
+const length_1 = require("../length");
 exports.CLOSEST_SIDE = 'closest-side';
 exports.FARTHEST_SIDE = 'farthest-side';
 exports.CLOSEST_CORNER = 'closest-corner';
@@ -13,17 +13,17 @@ exports.CIRCLE = 'circle';
 exports.ELLIPSE = 'ellipse';
 exports.COVER = 'cover';
 exports.CONTAIN = 'contain';
-exports.radialGradient = function (tokens) {
-    var shape = image_1.CSSRadialShape.CIRCLE;
-    var size = image_1.CSSRadialExtent.FARTHEST_CORNER;
-    var stops = [];
-    var position = [];
-    parser_1.parseFunctionArgs(tokens).forEach(function (arg, i) {
-        var isColorStop = true;
+exports.radialGradient = (tokens) => {
+    let shape = image_1.CSSRadialShape.CIRCLE;
+    let size = image_1.CSSRadialExtent.FARTHEST_CORNER;
+    const stops = [];
+    const position = [];
+    parser_1.parseFunctionArgs(tokens).forEach((arg, i) => {
+        let isColorStop = true;
         if (i === 0) {
-            var isAtPosition_1 = false;
-            isColorStop = arg.reduce(function (acc, token) {
-                if (isAtPosition_1) {
+            let isAtPosition = false;
+            isColorStop = arg.reduce((acc, token) => {
+                if (isAtPosition) {
                     if (parser_1.isIdentToken(token)) {
                         switch (token.value) {
                             case 'center':
@@ -52,7 +52,7 @@ exports.radialGradient = function (tokens) {
                             shape = image_1.CSSRadialShape.ELLIPSE;
                             return false;
                         case 'at':
-                            isAtPosition_1 = true;
+                            isAtPosition = true;
                             return false;
                         case exports.CLOSEST_SIDE:
                             size = image_1.CSSRadialExtent.CLOSEST_SIDE;
@@ -81,10 +81,10 @@ exports.radialGradient = function (tokens) {
             }, isColorStop);
         }
         if (isColorStop) {
-            var colorStop = gradient_1.parseColorStop(arg);
+            const colorStop = gradient_1.parseColorStop(arg);
             stops.push(colorStop);
         }
     });
-    return { size: size, shape: shape, stops: stops, position: position, type: image_1.CSSImageType.RADIAL_GRADIENT };
+    return { size, shape, stops, position, type: image_1.CSSImageType.RADIAL_GRADIENT };
 };
 //# sourceMappingURL=radial-gradient.js.map

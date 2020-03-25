@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var IPropertyDescriptor_1 = require("../IPropertyDescriptor");
-var parser_1 = require("../syntax/parser");
-var length_percentage_1 = require("../types/length-percentage");
+const IPropertyDescriptor_1 = require("../IPropertyDescriptor");
+const parser_1 = require("../syntax/parser");
+const length_percentage_1 = require("../types/length-percentage");
 var BACKGROUND_SIZE;
 (function (BACKGROUND_SIZE) {
     BACKGROUND_SIZE["AUTO"] = "auto";
@@ -14,11 +14,9 @@ exports.backgroundSize = {
     initialValue: '0',
     prefix: false,
     type: IPropertyDescriptor_1.PropertyDescriptorParsingType.LIST,
-    parse: function (tokens) {
-        return parser_1.parseFunctionArgs(tokens).map(function (values) { return values.filter(isBackgroundSizeInfoToken); });
+    parse: (tokens) => {
+        return parser_1.parseFunctionArgs(tokens).map(values => values.filter(isBackgroundSizeInfoToken));
     }
 };
-var isBackgroundSizeInfoToken = function (value) {
-    return parser_1.isIdentToken(value) || length_percentage_1.isLengthPercentage(value);
-};
+const isBackgroundSizeInfoToken = (value) => parser_1.isIdentToken(value) || length_percentage_1.isLengthPercentage(value);
 //# sourceMappingURL=background-size.js.map

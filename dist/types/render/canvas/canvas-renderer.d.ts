@@ -32,6 +32,8 @@ export interface RenderOptions {
         height: number;
     }) => void;
     shouldStopCallback?: () => boolean;
+    shouldStopOnInner?: boolean;
+    shouldStopTimeframe?: number;
 }
 export declare class CanvasRenderer {
     canvas: HTMLCanvasElement;

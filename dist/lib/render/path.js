@@ -5,14 +5,14 @@ var PathType;
     PathType[PathType["VECTOR"] = 0] = "VECTOR";
     PathType[PathType["BEZIER_CURVE"] = 1] = "BEZIER_CURVE";
 })(PathType = exports.PathType || (exports.PathType = {}));
-exports.equalPath = function (a, b) {
+exports.equalPath = (a, b) => {
     if (a.length === b.length) {
-        return a.some(function (v, i) { return v === b[i]; });
+        return a.some((v, i) => v === b[i]);
     }
     return false;
 };
-exports.transformPath = function (path, deltaX, deltaY, deltaW, deltaH) {
-    return path.map(function (point, index) {
+exports.transformPath = (path, deltaX, deltaY, deltaW, deltaH) => {
+    return path.map((point, index) => {
         switch (index) {
             case 0:
                 return point.add(deltaX, deltaY);

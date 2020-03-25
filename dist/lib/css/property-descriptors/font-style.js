@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var IPropertyDescriptor_1 = require("../IPropertyDescriptor");
+const IPropertyDescriptor_1 = require("../IPropertyDescriptor");
 var FONT_STYLE;
 (function (FONT_STYLE) {
     FONT_STYLE["NORMAL"] = "normal";
@@ -12,7 +12,7 @@ exports.fontStyle = {
     initialValue: 'normal',
     prefix: false,
     type: IPropertyDescriptor_1.PropertyDescriptorParsingType.IDENT_VALUE,
-    parse: function (overflow) {
+    parse: (overflow) => {
         switch (overflow) {
             case 'oblique':
                 return FONT_STYLE.OBLIQUE;

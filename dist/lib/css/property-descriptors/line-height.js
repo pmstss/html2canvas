@@ -1,16 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var IPropertyDescriptor_1 = require("../IPropertyDescriptor");
-var parser_1 = require("../syntax/parser");
-var tokenizer_1 = require("../syntax/tokenizer");
-var length_percentage_1 = require("../types/length-percentage");
+const IPropertyDescriptor_1 = require("../IPropertyDescriptor");
+const parser_1 = require("../syntax/parser");
+const tokenizer_1 = require("../syntax/tokenizer");
+const length_percentage_1 = require("../types/length-percentage");
 exports.lineHeight = {
     name: 'line-height',
     initialValue: 'normal',
     prefix: false,
     type: IPropertyDescriptor_1.PropertyDescriptorParsingType.TOKEN_VALUE
 };
-exports.computeLineHeight = function (token, fontSize) {
+exports.computeLineHeight = (token, fontSize) => {
     if (parser_1.isIdentToken(token) && token.value === 'normal') {
         return 1.2 * fontSize;
     }

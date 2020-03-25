@@ -1,62 +1,59 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var list_style_type_1 = require("../../property-descriptors/list-style-type");
-var css_line_break_1 = require("css-line-break");
-var bitwise_1 = require("../../../core/bitwise");
-var CounterState = /** @class */ (function () {
-    function CounterState() {
+const list_style_type_1 = require("../../property-descriptors/list-style-type");
+const css_line_break_1 = require("css-line-break");
+const bitwise_1 = require("../../../core/bitwise");
+class CounterState {
+    constructor() {
         this.counters = {};
     }
-    CounterState.prototype.getCounterValue = function (name) {
-        var counter = this.counters[name];
+    getCounterValue(name) {
+        const counter = this.counters[name];
         if (counter && counter.length) {
             return counter[counter.length - 1];
         }
         return 1;
-    };
-    CounterState.prototype.getCounterValues = function (name) {
-        var counter = this.counters[name];
+    }
+    getCounterValues(name) {
+        const counter = this.counters[name];
         return counter ? counter : [];
-    };
-    CounterState.prototype.pop = function (counters) {
-        var _this = this;
-        counters.forEach(function (counter) { return _this.counters[counter].pop(); });
-    };
-    CounterState.prototype.parse = function (style) {
-        var _this = this;
-        var counterIncrement = style.counterIncrement;
-        var counterReset = style.counterReset;
-        var canReset = true;
+    }
+    pop(counters) {
+        counters.forEach(counter => this.counters[counter].pop());
+    }
+    parse(style) {
+        const counterIncrement = style.counterIncrement;
+        const counterReset = style.counterReset;
+        let canReset = true;
         if (counterIncrement !== null) {
-            counterIncrement.forEach(function (entry) {
-                var counter = _this.counters[entry.counter];
+            counterIncrement.forEach(entry => {
+                const counter = this.counters[entry.counter];
                 if (counter && entry.increment !== 0) {
                     canReset = false;
                     counter[Math.max(0, counter.length - 1)] += entry.increment;
                 }
             });
         }
-        var counterNames = [];
+        const counterNames = [];
         if (canReset) {
-            counterReset.forEach(function (entry) {
-                var counter = _this.counters[entry.counter];
+            counterReset.forEach(entry => {
+                let counter = this.counters[entry.counter];
                 counterNames.push(entry.counter);
                 if (!counter) {
-                    counter = _this.counters[entry.counter] = [];
+                    counter = this.counters[entry.counter] = [];
                 }
                 counter.push(entry.reset);
             });
         }
         return counterNames;
-    };
-    return CounterState;
-}());
+    }
+}
 exports.CounterState = CounterState;
-var ROMAN_UPPER = {
+const ROMAN_UPPER = {
     integers: [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1],
     values: ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I']
 };
-var ARMENIAN = {
+const ARMENIAN = {
     integers: [
         9000,
         8000,
@@ -134,7 +131,7 @@ var ARMENIAN = {
         'Ա'
     ]
 };
-var HEBREW = {
+const HEBREW = {
     integers: [
         10000,
         9000,
@@ -214,7 +211,7 @@ var HEBREW = {
         'א'
     ]
 };
-var GEORGIAN = {
+const GEORGIAN = {
     integers: [
         10000,
         9000,
@@ -294,11 +291,11 @@ var GEORGIAN = {
         'ა'
     ]
 };
-var createAdditiveCounter = function (value, min, max, symbols, fallback, suffix) {
+const createAdditiveCounter = (value, min, max, symbols, fallback, suffix) => {
     if (value < min || value > max) {
         return exports.createCounterText(value, fallback, suffix.length > 0);
     }
-    return (symbols.integers.reduce(function (string, integer, index) {
+    return (symbols.integers.reduce((string, integer, index) => {
         while (value >= integer) {
             value -= integer;
             string += symbols.values[index];
@@ -306,8 +303,8 @@ var createAdditiveCounter = function (value, min, max, symbols, fallback, suffix
         return string;
     }, '') + suffix);
 };
-var createCounterStyleWithSymbolResolver = function (value, codePointRangeLength, isNumeric, resolver) {
-    var string = '';
+const createCounterStyleWithSymbolResolver = (value, codePointRangeLength, isNumeric, resolver) => {
+    let string = '';
     do {
         if (!isNumeric) {
             value--;
@@ -317,34 +314,31 @@ var createCounterStyleWithSymbolResolver = function (value, codePointRangeLength
     } while (value * codePointRangeLength >= codePointRangeLength);
     return string;
 };
-var createCounterStyleFromRange = function (value, codePointRangeStart, codePointRangeEnd, isNumeric, suffix) {
-    var codePointRangeLength = codePointRangeEnd - codePointRangeStart + 1;
+const createCounterStyleFromRange = (value, codePointRangeStart, codePointRangeEnd, isNumeric, suffix) => {
+    const codePointRangeLength = codePointRangeEnd - codePointRangeStart + 1;
     return ((value < 0 ? '-' : '') +
-        (createCounterStyleWithSymbolResolver(Math.abs(value), codePointRangeLength, isNumeric, function (codePoint) {
-            return css_line_break_1.fromCodePoint(Math.floor(codePoint % codePointRangeLength) + codePointRangeStart);
-        }) +
+        (createCounterStyleWithSymbolResolver(Math.abs(value), codePointRangeLength, isNumeric, codePoint => css_line_break_1.fromCodePoint(Math.floor(codePoint % codePointRangeLength) + codePointRangeStart)) +
             suffix));
 };
-var createCounterStyleFromSymbols = function (value, symbols, suffix) {
-    if (suffix === void 0) { suffix = '. '; }
-    var codePointRangeLength = symbols.length;
-    return (createCounterStyleWithSymbolResolver(Math.abs(value), codePointRangeLength, false, function (codePoint) { return symbols[Math.floor(codePoint % codePointRangeLength)]; }) + suffix);
+const createCounterStyleFromSymbols = (value, symbols, suffix = '. ') => {
+    const codePointRangeLength = symbols.length;
+    return (createCounterStyleWithSymbolResolver(Math.abs(value), codePointRangeLength, false, codePoint => symbols[Math.floor(codePoint % codePointRangeLength)]) + suffix);
 };
-var CJK_ZEROS = 1 << 0;
-var CJK_TEN_COEFFICIENTS = 1 << 1;
-var CJK_TEN_HIGH_COEFFICIENTS = 1 << 2;
-var CJK_HUNDRED_COEFFICIENTS = 1 << 3;
-var createCJKCounter = function (value, numbers, multipliers, negativeSign, suffix, flags) {
+const CJK_ZEROS = 1 << 0;
+const CJK_TEN_COEFFICIENTS = 1 << 1;
+const CJK_TEN_HIGH_COEFFICIENTS = 1 << 2;
+const CJK_HUNDRED_COEFFICIENTS = 1 << 3;
+const createCJKCounter = (value, numbers, multipliers, negativeSign, suffix, flags) => {
     if (value < -9999 || value > 9999) {
         return exports.createCounterText(value, list_style_type_1.LIST_STYLE_TYPE.CJK_DECIMAL, suffix.length > 0);
     }
-    var tmp = Math.abs(value);
-    var string = suffix;
+    let tmp = Math.abs(value);
+    let string = suffix;
     if (tmp === 0) {
         return numbers[0] + string;
     }
-    for (var digit = 0; tmp > 0 && digit <= 4; digit++) {
-        var coefficient = tmp % 10;
+    for (let digit = 0; tmp > 0 && digit <= 4; digit++) {
+        let coefficient = tmp % 10;
         if (coefficient === 0 && bitwise_1.contains(flags, CJK_ZEROS) && string !== '') {
             string = numbers[coefficient] + string;
         }
@@ -362,15 +356,15 @@ var createCJKCounter = function (value, numbers, multipliers, negativeSign, suff
     }
     return (value < 0 ? negativeSign : '') + string;
 };
-var CHINESE_INFORMAL_MULTIPLIERS = '十百千萬';
-var CHINESE_FORMAL_MULTIPLIERS = '拾佰仟萬';
-var JAPANESE_NEGATIVE = 'マイナス';
-var KOREAN_NEGATIVE = '마이너스';
-exports.createCounterText = function (value, type, appendSuffix) {
-    var defaultSuffix = appendSuffix ? '. ' : '';
-    var cjkSuffix = appendSuffix ? '、' : '';
-    var koreanSuffix = appendSuffix ? ', ' : '';
-    var spaceSuffix = appendSuffix ? ' ' : '';
+const CHINESE_INFORMAL_MULTIPLIERS = '十百千萬';
+const CHINESE_FORMAL_MULTIPLIERS = '拾佰仟萬';
+const JAPANESE_NEGATIVE = 'マイナス';
+const KOREAN_NEGATIVE = '마이너스';
+exports.createCounterText = (value, type, appendSuffix) => {
+    const defaultSuffix = appendSuffix ? '. ' : '';
+    const cjkSuffix = appendSuffix ? '、' : '';
+    const koreanSuffix = appendSuffix ? ', ' : '';
+    const spaceSuffix = appendSuffix ? ' ' : '';
     switch (type) {
         case list_style_type_1.LIST_STYLE_TYPE.DISC:
             return '•' + spaceSuffix;
@@ -379,8 +373,8 @@ exports.createCounterText = function (value, type, appendSuffix) {
         case list_style_type_1.LIST_STYLE_TYPE.SQUARE:
             return '◾' + spaceSuffix;
         case list_style_type_1.LIST_STYLE_TYPE.DECIMAL_LEADING_ZERO:
-            var string = createCounterStyleFromRange(value, 48, 57, true, defaultSuffix);
-            return string.length < 4 ? "0" + string : string;
+            const string = createCounterStyleFromRange(value, 48, 57, true, defaultSuffix);
+            return string.length < 4 ? `0${string}` : string;
         case list_style_type_1.LIST_STYLE_TYPE.CJK_DECIMAL:
             return createCounterStyleFromSymbols(value, '〇一二三四五六七八九', cjkSuffix);
         case list_style_type_1.LIST_STYLE_TYPE.LOWER_ROMAN:

@@ -1,24 +1,24 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var IPropertyDescriptor_1 = require("../IPropertyDescriptor");
-var parser_1 = require("../syntax/parser");
+const IPropertyDescriptor_1 = require("../IPropertyDescriptor");
+const parser_1 = require("../syntax/parser");
 exports.counterReset = {
     name: 'counter-reset',
     initialValue: 'none',
     prefix: true,
     type: IPropertyDescriptor_1.PropertyDescriptorParsingType.LIST,
-    parse: function (tokens) {
+    parse: (tokens) => {
         if (tokens.length === 0) {
             return [];
         }
-        var resets = [];
-        var filtered = tokens.filter(parser_1.nonWhiteSpace);
-        for (var i = 0; i < filtered.length; i++) {
-            var counter = filtered[i];
-            var next = filtered[i + 1];
+        const resets = [];
+        const filtered = tokens.filter(parser_1.nonWhiteSpace);
+        for (let i = 0; i < filtered.length; i++) {
+            const counter = filtered[i];
+            const next = filtered[i + 1];
             if (parser_1.isIdentToken(counter) && counter.value !== 'none') {
-                var reset = next && parser_1.isNumberToken(next) ? next.number : 0;
-                resets.push({ counter: counter.value, reset: reset });
+                const reset = next && parser_1.isNumberToken(next) ? next.number : 0;
+                resets.push({ counter: counter.value, reset });
             }
         }
         return resets;

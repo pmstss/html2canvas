@@ -1,40 +1,33 @@
 "use strict";
-var __spreadArrays = (this && this.__spreadArrays) || function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var css_1 = require("../css");
-var element_container_1 = require("./element-container");
-var text_container_1 = require("./text-container");
-var image_element_container_1 = require("./replaced-elements/image-element-container");
-var canvas_element_container_1 = require("./replaced-elements/canvas-element-container");
-var svg_element_container_1 = require("./replaced-elements/svg-element-container");
-var li_element_container_1 = require("./elements/li-element-container");
-var ol_element_container_1 = require("./elements/ol-element-container");
-var input_element_container_1 = require("./replaced-elements/input-element-container");
-var select_element_container_1 = require("./elements/select-element-container");
-var textarea_element_container_1 = require("./elements/textarea-element-container");
-var iframe_element_container_1 = require("./replaced-elements/iframe-element-container");
-var anchor_element_container_1 = require("./elements/anchor-element-container");
-var word_break_1 = require("../css/property-descriptors/word-break");
-var bounds_1 = require("../css/layout/bounds");
-var text_1 = require("../css/layout/text");
-var LIST_OWNERS = ['OL', 'UL', 'MENU'];
-var EPS = 0.01;
+const css_1 = require("../css");
+const element_container_1 = require("./element-container");
+const text_container_1 = require("./text-container");
+const image_element_container_1 = require("./replaced-elements/image-element-container");
+const canvas_element_container_1 = require("./replaced-elements/canvas-element-container");
+const svg_element_container_1 = require("./replaced-elements/svg-element-container");
+const li_element_container_1 = require("./elements/li-element-container");
+const ol_element_container_1 = require("./elements/ol-element-container");
+const input_element_container_1 = require("./replaced-elements/input-element-container");
+const select_element_container_1 = require("./elements/select-element-container");
+const textarea_element_container_1 = require("./elements/textarea-element-container");
+const iframe_element_container_1 = require("./replaced-elements/iframe-element-container");
+const anchor_element_container_1 = require("./elements/anchor-element-container");
+const word_break_1 = require("../css/property-descriptors/word-break");
+const bounds_1 = require("../css/layout/bounds");
+const text_1 = require("../css/layout/text");
+const LIST_OWNERS = ['OL', 'UL', 'MENU'];
+const EPS = 0.01;
 // TODO: move to options
-var useTextSplitDnc = '*'.charCodeAt(0) === 42; // to avoid trim from dist build
+const useTextSplitDnc = '*'.charCodeAt(0) === 42; // to avoid trim from dist build
 /**
  * Custom getClientRects() implementation with combining adjacent rects
  * @param range source of client rects
  */
-var getClientRects = function (range) {
-    return Array.from(range.getClientRects()).reduce(function (res, rect) {
+const getClientRects = (range) => {
+    return Array.from(range.getClientRects()).reduce((res, rect) => {
         if (res.length > 0) {
-            var prevRect = res[res.length - 1];
+            const prevRect = res[res.length - 1];
             if (Math.abs(prevRect.x + prevRect.width - rect.x) < EPS && Math.abs(prevRect.y - rect.y) < EPS) {
                 prevRect.width += rect.width;
             }
@@ -54,13 +47,13 @@ var getClientRects = function (range) {
  * @param range pre-created Range
  * @see splitTextByLineWrapsDnc()
  */
-var splitTextByLineWrapsLinear = function (textNode, range) {
+const splitTextByLineWrapsLinear = (textNode, range) => {
     range.selectNodeContents(textNode);
     if (getClientRects(range).length < 2) {
         return [textNode];
     }
-    var textNodes = [];
-    var i = 0;
+    const textNodes = [];
+    let i = 0;
     while (textNode && ++i <= textNode.data.length) {
         range.setEnd(textNode, i);
         if (getClientRects(range).length > 1) {
@@ -81,27 +74,27 @@ var splitTextByLineWrapsLinear = function (textNode, range) {
  * @param range pre-created Range
  * @see splitTextByLineWrapsDnc()
  */
-var splitTextIntoSingleRectNodes = function (textNode, range) {
+const splitTextIntoSingleRectNodes = (textNode, range) => {
     if (!textNode.data) {
         return [];
     }
     range.selectNodeContents(textNode);
     // this is the most expensive operation, that should be minimized
-    var clientRects = getClientRects(range);
+    const clientRects = getClientRects(range);
     // filtering empty/hidden/etc nodes for proper expectedPartLength
-    var numberOfRects = clientRects.length;
-    var numberOfLines = Math.max(1, clientRects.filter(function (r) { return r.width > 1 && r.height > 1; }).length);
+    const numberOfRects = clientRects.length;
+    const numberOfLines = Math.max(1, clientRects.filter(r => r.width > 1 && r.height > 1).length);
     if (numberOfRects < 2) {
         return [textNode];
     }
-    var textNodes = [];
+    const textNodes = [];
     // as getClientRects() is expensive, instead of binary split recursive calls,
     // minimizing its usage by splitting into N parts at once
-    var numberOfParts = Math.max(2, numberOfLines);
-    var expectedPartLength = Math.floor(textNode.data.length / numberOfParts);
-    var i = 0;
+    const numberOfParts = Math.max(2, numberOfLines);
+    const expectedPartLength = Math.floor(textNode.data.length / numberOfParts);
+    let i = 0;
     while (++i < numberOfParts) {
-        var secondPart = textNode.splitText(expectedPartLength);
+        const secondPart = textNode.splitText(expectedPartLength);
         if (textNode.data) {
             textNodes.push(textNode);
         }
@@ -110,7 +103,7 @@ var splitTextIntoSingleRectNodes = function (textNode, range) {
     if (textNode.data) {
         textNodes.push(textNode);
     }
-    return textNodes.reduce(function (res, subTextNode) { return __spreadArrays(res, splitTextIntoSingleRectNodes(subTextNode, range)); }, []);
+    return textNodes.reduce((res, subTextNode) => [...res, ...splitTextIntoSingleRectNodes(subTextNode, range)], []);
 };
 /**
  * "Divide and conquer" approach for split by lines wrap in contrast to splitTextByLineWrapsLinear()
@@ -118,15 +111,15 @@ var splitTextIntoSingleRectNodes = function (textNode, range) {
  * @param range pre-created Range
  * @see splitTextByLineWrapsLinear()
  */
-var splitTextByLineWrapsDnc = function (textNode, range) {
+const splitTextByLineWrapsDnc = (textNode, range) => {
     range.selectNodeContents(textNode);
     if (getClientRects(range).length < 2) {
         return [textNode];
     }
     // preprocess for performance reasons
-    var textNodes = splitByNewLines(textNode);
+    let textNodes = splitByNewLines(textNode);
     // actual "Divide and conquer" calls
-    textNodes = textNodes.reduce(function (res, subTextNode) { return __spreadArrays(res, splitTextIntoSingleRectNodes(subTextNode, range)); }, []);
+    textNodes = textNodes.reduce((res, subTextNode) => [...res, ...splitTextIntoSingleRectNodes(subTextNode, range)], []);
     // postprocessing: merging single rect nodes into single line nodes
     textNodes = mergeAdjacentOneLinesNodes(textNodes, range);
     // postprocessing: between-nodes space normalization
@@ -140,13 +133,13 @@ var splitTextByLineWrapsDnc = function (textNode, range) {
  * @param textNode Text node to split
  * @see splitTextByLineWrapsDnc()
  */
-var splitByNewLines = function (textNode) {
+const splitByNewLines = (textNode) => {
     if (textNode.data.includes('\n')) {
-        var textNodes = [];
+        const textNodes = [];
         while (textNode.data.includes('\n')) {
-            var idx = textNode.data.indexOf('\n');
+            const idx = textNode.data.indexOf('\n');
             // extract '\n' into separate node, not included into result, but major for proper client rect calculations
-            var secondPart = textNode.splitText(idx);
+            let secondPart = textNode.splitText(idx);
             secondPart = secondPart.splitText(1);
             if (textNode.data) {
                 textNodes.push(textNode);
@@ -165,15 +158,15 @@ var splitByNewLines = function (textNode) {
  * @param textNodes Text[] to run merge on
  * @param range pre-created Range
  */
-var mergeAdjacentOneLinesNodes = function (textNodes, range) {
-    return textNodes.reduce(function (res, textNode) {
-        var prevTextNode = res.length > 0 ? res[res.length - 1] : null;
+const mergeAdjacentOneLinesNodes = (textNodes, range) => {
+    return textNodes.reduce((res, textNode) => {
+        const prevTextNode = res.length > 0 ? res[res.length - 1] : null;
         if (prevTextNode) {
             range.selectNodeContents(prevTextNode);
-            var tmpRects = getClientRects(range);
-            var prevClientRect = tmpRects[tmpRects.length - 1];
+            const tmpRects = getClientRects(range);
+            const prevClientRect = tmpRects[tmpRects.length - 1];
             range.selectNodeContents(textNode);
-            var clientRect = getClientRects(range)[0];
+            const clientRect = getClientRects(range)[0];
             if (Math.abs(prevClientRect.x + prevClientRect.width - clientRect.x) < EPS &&
                 Math.abs(prevClientRect.y - clientRect.y) < EPS) {
                 prevTextNode.appendData(textNode.data);
@@ -193,30 +186,29 @@ var mergeAdjacentOneLinesNodes = function (textNodes, range) {
  * "Normalize" spacing in adjacent per-line text nodes by moving them from line start to line end
  * @param textNodes Text[] to "normalize"
  */
-var moveSpacesToLineEnds = function (textNodes) {
-    textNodes.forEach(function (textNode, idx) {
+const moveSpacesToLineEnds = (textNodes) => {
+    textNodes.forEach((textNode, idx) => {
         if (idx > 0) {
-            var spacePrefix_1 = null;
-            textNode.data = textNode.data.replace(/^\s+/, function (token) {
-                spacePrefix_1 = token;
+            let spacePrefix = null;
+            textNode.data = textNode.data.replace(/^\s+/, (token) => {
+                spacePrefix = token;
                 return '';
             });
-            if (spacePrefix_1) {
-                textNodes[idx - 1].appendData(spacePrefix_1);
+            if (spacePrefix) {
+                textNodes[idx - 1].appendData(spacePrefix);
             }
         }
     });
 };
 // TODO: trivial space normalization, could be wrong in some cases; improve
-var getNormalizedText = function (txt) {
-    var parent = txt.parentElement;
+const getNormalizedText = (txt) => {
+    const parent = txt.parentElement;
     return (txt.textContent || '').includes(parent.innerText)
         ? parent.innerText
         : (txt.textContent || '').replace(/[\t\n\r ]+/g, ' ');
 };
-var parseNodeTree = function (node, parent, root) {
-    var _loop_1 = function (childNode, nextNode) {
-        var _a;
+const parseNodeTree = (node, parent, root) => {
+    for (let childNode = node.firstChild, nextNode; childNode; childNode = nextNode) {
         nextNode = childNode.nextSibling;
         if (exports.isTextNode(childNode) && childNode.data.trim().length > 0) {
             /*
@@ -225,33 +217,33 @@ var parseNodeTree = function (node, parent, root) {
               Workaround: split text node into single-rect text nodes with putting each one into aux ElementContainer,
               that inherits background props (color, etc) from parent node.
             */
-            var range_1 = node.ownerDocument.createRange();
-            var textNodes = useTextSplitDnc
-                ? splitTextByLineWrapsDnc(childNode, range_1)
-                : splitTextByLineWrapsLinear(childNode, range_1);
-            var styles_1 = new css_1.CSSParsedDeclaration(window.getComputedStyle(node, null));
+            const range = node.ownerDocument.createRange();
+            const textNodes = useTextSplitDnc
+                ? splitTextByLineWrapsDnc(childNode, range)
+                : splitTextByLineWrapsLinear(childNode, range);
+            const styles = new css_1.CSSParsedDeclaration(window.getComputedStyle(node, null));
             /*
               After "manual" dividing into single client rect element, reset word-break property to avoid
               redundant additional processing by LineBreaker (see breakText())
              */
-            styles_1.wordBreak = word_break_1.WORD_BREAK.NORMAL;
+            styles.wordBreak = word_break_1.WORD_BREAK.NORMAL;
             /*
               Aux ElementContainer will inherit background color, so parent color can be omited to avoid
               drawing "invalid" BoundingClientRect.
              */
             parent.styles.backgroundColor = 0;
-            (_a = parent.elements).push.apply(_a, textNodes.map(function (n) {
-                range_1.selectNodeContents(n);
-                var bounds = bounds_1.Bounds.fromClientRect(range_1.getBoundingClientRect());
-                var auxTextContainer = new element_container_1.ElementContainer(
+            parent.elements.push(...textNodes.map((n) => {
+                range.selectNodeContents(n);
+                const bounds = bounds_1.Bounds.fromClientRect(range.getBoundingClientRect());
+                const auxTextContainer = new element_container_1.ElementContainer(
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                null, styles_1, bounds);
-                auxTextContainer.textNodes.push(new text_container_1.TextContainer(n, styles_1, [new text_1.TextBounds(getNormalizedText(n), bounds)]));
+                null, styles, bounds);
+                auxTextContainer.textNodes.push(new text_container_1.TextContainer(n, styles, [new text_1.TextBounds(getNormalizedText(n), bounds)]));
                 return auxTextContainer;
             }));
         }
         else if (exports.isElementNode(childNode)) {
-            var container = createContainer(childNode);
+            const container = createContainer(childNode);
             if (container.styles.isVisible()) {
                 if (createsRealStackingContext(childNode, container, root)) {
                     container.flags |= 4 /* CREATES_REAL_STACKING_CONTEXT */;
@@ -268,15 +260,9 @@ var parseNodeTree = function (node, parent, root) {
                 }
             }
         }
-        out_nextNode_1 = nextNode;
-    };
-    var out_nextNode_1;
-    for (var childNode = node.firstChild, nextNode = void 0; childNode; childNode = nextNode) {
-        _loop_1(childNode, nextNode);
-        nextNode = out_nextNode_1;
     }
 };
-var createContainer = function (element) {
+const createContainer = (element) => {
     if (exports.isImageElement(element)) {
         return new image_element_container_1.ImageElementContainer(element);
     }
@@ -309,36 +295,34 @@ var createContainer = function (element) {
     }
     return new element_container_1.ElementContainer(element);
 };
-exports.parseTree = function (element) {
-    var container = createContainer(element);
+exports.parseTree = (element) => {
+    const container = createContainer(element);
     container.flags |= 4 /* CREATES_REAL_STACKING_CONTEXT */;
     parseNodeTree(element, container, container);
     return container;
 };
-var createsRealStackingContext = function (node, container, root) {
+const createsRealStackingContext = (node, container, root) => {
     return (container.styles.isPositionedWithZIndex() ||
         container.styles.opacity < 1 ||
         container.styles.isTransformed() ||
         (exports.isBodyElement(node) && root.styles.isTransparent()));
 };
-var createsStackingContext = function (styles) { return styles.isPositioned() || styles.isFloating(); };
-exports.isTextNode = function (node) { return node.nodeType === Node.TEXT_NODE; };
-exports.isElementNode = function (node) { return node.nodeType === Node.ELEMENT_NODE; };
-exports.isHTMLElementNode = function (node) {
-    return typeof node.style !== 'undefined';
-};
-exports.isLIElement = function (node) { return node.tagName === 'LI'; };
-exports.isOLElement = function (node) { return node.tagName === 'OL'; };
-exports.isInputElement = function (node) { return node.tagName === 'INPUT'; };
-exports.isHTMLElement = function (node) { return node.tagName === 'HTML'; };
-exports.isSVGElement = function (node) { return node.tagName === 'svg'; };
-exports.isBodyElement = function (node) { return node.tagName === 'BODY'; };
-exports.isCanvasElement = function (node) { return node.tagName === 'CANVAS'; };
-exports.isImageElement = function (node) { return node.tagName === 'IMG'; };
-exports.isIFrameElement = function (node) { return node.tagName === 'IFRAME'; };
-exports.isStyleElement = function (node) { return node.tagName === 'STYLE'; };
-exports.isScriptElement = function (node) { return node.tagName === 'SCRIPT'; };
-exports.isTextareaElement = function (node) { return node.tagName === 'TEXTAREA'; };
-exports.isSelectElement = function (node) { return node.tagName === 'SELECT'; };
-exports.isAnchorElement = function (node) { return node.tagName === 'A'; };
+const createsStackingContext = (styles) => styles.isPositioned() || styles.isFloating();
+exports.isTextNode = (node) => node.nodeType === Node.TEXT_NODE;
+exports.isElementNode = (node) => node.nodeType === Node.ELEMENT_NODE;
+exports.isHTMLElementNode = (node) => typeof node.style !== 'undefined';
+exports.isLIElement = (node) => node.tagName === 'LI';
+exports.isOLElement = (node) => node.tagName === 'OL';
+exports.isInputElement = (node) => node.tagName === 'INPUT';
+exports.isHTMLElement = (node) => node.tagName === 'HTML';
+exports.isSVGElement = (node) => node.tagName === 'svg';
+exports.isBodyElement = (node) => node.tagName === 'BODY';
+exports.isCanvasElement = (node) => node.tagName === 'CANVAS';
+exports.isImageElement = (node) => node.tagName === 'IMG';
+exports.isIFrameElement = (node) => node.tagName === 'IFRAME';
+exports.isStyleElement = (node) => node.tagName === 'STYLE';
+exports.isScriptElement = (node) => node.tagName === 'SCRIPT';
+exports.isTextareaElement = (node) => node.tagName === 'TEXTAREA';
+exports.isSelectElement = (node) => node.tagName === 'SELECT';
+exports.isAnchorElement = (node) => node.tagName === 'A';
 //# sourceMappingURL=node-parser.js.map

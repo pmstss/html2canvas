@@ -1,16 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var text_transform_1 = require("../css/property-descriptors/text-transform");
-var text_1 = require("../css/layout/text");
-var TextContainer = /** @class */ (function () {
-    function TextContainer(node, styles, bounds) {
+const text_transform_1 = require("../css/property-descriptors/text-transform");
+const text_1 = require("../css/layout/text");
+class TextContainer {
+    constructor(node, styles, bounds) {
         this.text = transform(node.data, styles.textTransform);
         this.textBounds = bounds || text_1.parseTextBounds(this.text, styles, node);
     }
-    return TextContainer;
-}());
+}
 exports.TextContainer = TextContainer;
-var transform = function (text, transform) {
+const transform = (text, transform) => {
     switch (transform) {
         case text_transform_1.TEXT_TRANSFORM.LOWERCASE:
             return text.toLowerCase();
@@ -22,8 +21,8 @@ var transform = function (text, transform) {
             return text;
     }
 };
-var CAPITALIZE = /(^|\s|:|-|\(|\))([a-z])/g;
-var capitalize = function (m, p1, p2) {
+const CAPITALIZE = /(^|\s|:|-|\(|\))([a-z])/g;
+const capitalize = (m, p1, p2) => {
     if (m.length > 0) {
         return p1 + p2.toUpperCase();
     }

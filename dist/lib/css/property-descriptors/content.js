@@ -1,17 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var tokenizer_1 = require("../syntax/tokenizer");
-var IPropertyDescriptor_1 = require("../IPropertyDescriptor");
+const tokenizer_1 = require("../syntax/tokenizer");
+const IPropertyDescriptor_1 = require("../IPropertyDescriptor");
 exports.content = {
     name: 'content',
     initialValue: 'none',
     type: IPropertyDescriptor_1.PropertyDescriptorParsingType.LIST,
     prefix: false,
-    parse: function (tokens) {
+    parse: (tokens) => {
         if (tokens.length === 0) {
             return [];
         }
-        var first = tokens[0];
+        const first = tokens[0];
         if (first.type === tokenizer_1.TokenType.IDENT_TOKEN && first.value === 'none') {
             return [];
         }

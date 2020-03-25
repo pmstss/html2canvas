@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var IPropertyDescriptor_1 = require("../IPropertyDescriptor");
+const IPropertyDescriptor_1 = require("../IPropertyDescriptor");
 var TEXT_ALIGN;
 (function (TEXT_ALIGN) {
     TEXT_ALIGN[TEXT_ALIGN["LEFT"] = 0] = "LEFT";
@@ -12,7 +12,7 @@ exports.textAlign = {
     initialValue: 'left',
     prefix: false,
     type: IPropertyDescriptor_1.PropertyDescriptorParsingType.IDENT_VALUE,
-    parse: function (textAlign) {
+    parse: (textAlign) => {
         switch (textAlign) {
             case 'right':
                 return TEXT_ALIGN.RIGHT;

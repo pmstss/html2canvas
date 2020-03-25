@@ -1,14 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var tokenizer_1 = require("../syntax/tokenizer");
-var parser_1 = require("../syntax/parser");
-var length_1 = require("./length");
-exports.isLengthPercentage = function (token) {
-    return token.type === tokenizer_1.TokenType.PERCENTAGE_TOKEN || length_1.isLength(token);
-};
-exports.parseLengthPercentageTuple = function (tokens) {
-    return tokens.length > 1 ? [tokens[0], tokens[1]] : [tokens[0]];
-};
+const tokenizer_1 = require("../syntax/tokenizer");
+const parser_1 = require("../syntax/parser");
+const length_1 = require("./length");
+exports.isLengthPercentage = (token) => token.type === tokenizer_1.TokenType.PERCENTAGE_TOKEN || length_1.isLength(token);
+exports.parseLengthPercentageTuple = (tokens) => tokens.length > 1 ? [tokens[0], tokens[1]] : [tokens[0]];
 exports.ZERO_LENGTH = {
     type: tokenizer_1.TokenType.NUMBER_TOKEN,
     number: 0,
@@ -24,11 +20,11 @@ exports.HUNDRED_PERCENT = {
     number: 100,
     flags: tokenizer_1.FLAG_INTEGER
 };
-exports.getAbsoluteValueForTuple = function (tuple, width, height) {
-    var x = tuple[0], y = tuple[1];
+exports.getAbsoluteValueForTuple = (tuple, width, height) => {
+    let [x, y] = tuple;
     return [exports.getAbsoluteValue(x, width), exports.getAbsoluteValue(typeof y !== 'undefined' ? y : x, height)];
 };
-exports.getAbsoluteValue = function (token, parent) {
+exports.getAbsoluteValue = (token, parent) => {
     if (token.type === tokenizer_1.TokenType.PERCENTAGE_TOKEN) {
         return (token.number / 100) * parent;
     }

@@ -1,62 +1,62 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var IPropertyDescriptor_1 = require("./IPropertyDescriptor");
-var background_clip_1 = require("./property-descriptors/background-clip");
-var background_color_1 = require("./property-descriptors/background-color");
-var background_image_1 = require("./property-descriptors/background-image");
-var background_origin_1 = require("./property-descriptors/background-origin");
-var background_position_1 = require("./property-descriptors/background-position");
-var background_repeat_1 = require("./property-descriptors/background-repeat");
-var background_size_1 = require("./property-descriptors/background-size");
-var border_color_1 = require("./property-descriptors/border-color");
-var border_radius_1 = require("./property-descriptors/border-radius");
-var border_style_1 = require("./property-descriptors/border-style");
-var border_width_1 = require("./property-descriptors/border-width");
-var color_1 = require("./property-descriptors/color");
-var display_1 = require("./property-descriptors/display");
-var float_1 = require("./property-descriptors/float");
-var letter_spacing_1 = require("./property-descriptors/letter-spacing");
-var line_break_1 = require("./property-descriptors/line-break");
-var line_height_1 = require("./property-descriptors/line-height");
-var list_style_image_1 = require("./property-descriptors/list-style-image");
-var list_style_position_1 = require("./property-descriptors/list-style-position");
-var list_style_type_1 = require("./property-descriptors/list-style-type");
-var margin_1 = require("./property-descriptors/margin");
-var overflow_1 = require("./property-descriptors/overflow");
-var overflow_wrap_1 = require("./property-descriptors/overflow-wrap");
-var padding_1 = require("./property-descriptors/padding");
-var text_align_1 = require("./property-descriptors/text-align");
-var position_1 = require("./property-descriptors/position");
-var text_shadow_1 = require("./property-descriptors/text-shadow");
-var text_transform_1 = require("./property-descriptors/text-transform");
-var transform_1 = require("./property-descriptors/transform");
-var transform_origin_1 = require("./property-descriptors/transform-origin");
-var visibility_1 = require("./property-descriptors/visibility");
-var word_break_1 = require("./property-descriptors/word-break");
-var z_index_1 = require("./property-descriptors/z-index");
-var parser_1 = require("./syntax/parser");
-var tokenizer_1 = require("./syntax/tokenizer");
-var color_2 = require("./types/color");
-var angle_1 = require("./types/angle");
-var image_1 = require("./types/image");
-var opacity_1 = require("./property-descriptors/opacity");
-var text_decoration_color_1 = require("./property-descriptors/text-decoration-color");
-var text_decoration_line_1 = require("./property-descriptors/text-decoration-line");
-var length_percentage_1 = require("./types/length-percentage");
-var font_family_1 = require("./property-descriptors/font-family");
-var font_size_1 = require("./property-descriptors/font-size");
-var length_1 = require("./types/length");
-var font_weight_1 = require("./property-descriptors/font-weight");
-var font_variant_1 = require("./property-descriptors/font-variant");
-var font_style_1 = require("./property-descriptors/font-style");
-var bitwise_1 = require("../core/bitwise");
-var content_1 = require("./property-descriptors/content");
-var counter_increment_1 = require("./property-descriptors/counter-increment");
-var counter_reset_1 = require("./property-descriptors/counter-reset");
-var quotes_1 = require("./property-descriptors/quotes");
-var box_shadow_1 = require("./property-descriptors/box-shadow");
-var CSSParsedDeclaration = /** @class */ (function () {
-    function CSSParsedDeclaration(declaration) {
+const IPropertyDescriptor_1 = require("./IPropertyDescriptor");
+const background_clip_1 = require("./property-descriptors/background-clip");
+const background_color_1 = require("./property-descriptors/background-color");
+const background_image_1 = require("./property-descriptors/background-image");
+const background_origin_1 = require("./property-descriptors/background-origin");
+const background_position_1 = require("./property-descriptors/background-position");
+const background_repeat_1 = require("./property-descriptors/background-repeat");
+const background_size_1 = require("./property-descriptors/background-size");
+const border_color_1 = require("./property-descriptors/border-color");
+const border_radius_1 = require("./property-descriptors/border-radius");
+const border_style_1 = require("./property-descriptors/border-style");
+const border_width_1 = require("./property-descriptors/border-width");
+const color_1 = require("./property-descriptors/color");
+const display_1 = require("./property-descriptors/display");
+const float_1 = require("./property-descriptors/float");
+const letter_spacing_1 = require("./property-descriptors/letter-spacing");
+const line_break_1 = require("./property-descriptors/line-break");
+const line_height_1 = require("./property-descriptors/line-height");
+const list_style_image_1 = require("./property-descriptors/list-style-image");
+const list_style_position_1 = require("./property-descriptors/list-style-position");
+const list_style_type_1 = require("./property-descriptors/list-style-type");
+const margin_1 = require("./property-descriptors/margin");
+const overflow_1 = require("./property-descriptors/overflow");
+const overflow_wrap_1 = require("./property-descriptors/overflow-wrap");
+const padding_1 = require("./property-descriptors/padding");
+const text_align_1 = require("./property-descriptors/text-align");
+const position_1 = require("./property-descriptors/position");
+const text_shadow_1 = require("./property-descriptors/text-shadow");
+const text_transform_1 = require("./property-descriptors/text-transform");
+const transform_1 = require("./property-descriptors/transform");
+const transform_origin_1 = require("./property-descriptors/transform-origin");
+const visibility_1 = require("./property-descriptors/visibility");
+const word_break_1 = require("./property-descriptors/word-break");
+const z_index_1 = require("./property-descriptors/z-index");
+const parser_1 = require("./syntax/parser");
+const tokenizer_1 = require("./syntax/tokenizer");
+const color_2 = require("./types/color");
+const angle_1 = require("./types/angle");
+const image_1 = require("./types/image");
+const opacity_1 = require("./property-descriptors/opacity");
+const text_decoration_color_1 = require("./property-descriptors/text-decoration-color");
+const text_decoration_line_1 = require("./property-descriptors/text-decoration-line");
+const length_percentage_1 = require("./types/length-percentage");
+const font_family_1 = require("./property-descriptors/font-family");
+const font_size_1 = require("./property-descriptors/font-size");
+const length_1 = require("./types/length");
+const font_weight_1 = require("./property-descriptors/font-weight");
+const font_variant_1 = require("./property-descriptors/font-variant");
+const font_style_1 = require("./property-descriptors/font-style");
+const bitwise_1 = require("../core/bitwise");
+const content_1 = require("./property-descriptors/content");
+const counter_increment_1 = require("./property-descriptors/counter-increment");
+const counter_reset_1 = require("./property-descriptors/counter-reset");
+const quotes_1 = require("./property-descriptors/quotes");
+const box_shadow_1 = require("./property-descriptors/box-shadow");
+class CSSParsedDeclaration {
+    constructor(declaration) {
         this.backgroundClip = parse(background_clip_1.backgroundClip, declaration.backgroundClip);
         this.backgroundColor = parse(background_color_1.backgroundColor, declaration.backgroundColor);
         this.backgroundImage = parse(background_image_1.backgroundImage, declaration.backgroundImage);
@@ -100,7 +100,7 @@ var CSSParsedDeclaration = /** @class */ (function () {
         this.marginBottom = parse(margin_1.marginBottom, declaration.marginBottom);
         this.marginLeft = parse(margin_1.marginLeft, declaration.marginLeft);
         this.opacity = parse(opacity_1.opacity, declaration.opacity);
-        var overflowTuple = parse(overflow_1.overflow, declaration.overflow);
+        const overflowTuple = parse(overflow_1.overflow, declaration.overflow);
         this.overflowX = overflowTuple[0];
         this.overflowY = overflowTuple[overflowTuple.length > 1 ? 1 : 0];
         this.overflowWrap = parse(overflow_wrap_1.overflowWrap, declaration.overflowWrap);
@@ -120,60 +120,57 @@ var CSSParsedDeclaration = /** @class */ (function () {
         this.wordBreak = parse(word_break_1.wordBreak, declaration.wordBreak);
         this.zIndex = parse(z_index_1.zIndex, declaration.zIndex);
     }
-    CSSParsedDeclaration.prototype.isVisible = function () {
+    isVisible() {
         return this.display > 0 && this.opacity > 0 && this.visibility === visibility_1.VISIBILITY.VISIBLE;
-    };
-    CSSParsedDeclaration.prototype.isTransparent = function () {
+    }
+    isTransparent() {
         return color_2.isTransparent(this.backgroundColor);
-    };
-    CSSParsedDeclaration.prototype.isTransformed = function () {
+    }
+    isTransformed() {
         return this.transform !== null;
-    };
-    CSSParsedDeclaration.prototype.isPositioned = function () {
+    }
+    isPositioned() {
         return this.position !== position_1.POSITION.STATIC;
-    };
-    CSSParsedDeclaration.prototype.isPositionedWithZIndex = function () {
+    }
+    isPositionedWithZIndex() {
         return this.isPositioned() && !this.zIndex.auto;
-    };
-    CSSParsedDeclaration.prototype.isFloating = function () {
+    }
+    isFloating() {
         return this.float !== float_1.FLOAT.NONE;
-    };
-    CSSParsedDeclaration.prototype.isInlineLevel = function () {
+    }
+    isInlineLevel() {
         return (bitwise_1.contains(this.display, 4 /* INLINE */) ||
             bitwise_1.contains(this.display, 33554432 /* INLINE_BLOCK */) ||
             bitwise_1.contains(this.display, 268435456 /* INLINE_FLEX */) ||
             bitwise_1.contains(this.display, 536870912 /* INLINE_GRID */) ||
             bitwise_1.contains(this.display, 67108864 /* INLINE_LIST_ITEM */) ||
             bitwise_1.contains(this.display, 134217728 /* INLINE_TABLE */));
-    };
-    return CSSParsedDeclaration;
-}());
+    }
+}
 exports.CSSParsedDeclaration = CSSParsedDeclaration;
-var CSSParsedPseudoDeclaration = /** @class */ (function () {
-    function CSSParsedPseudoDeclaration(declaration) {
+class CSSParsedPseudoDeclaration {
+    constructor(declaration) {
         this.content = parse(content_1.content, declaration.content);
         this.quotes = parse(quotes_1.quotes, declaration.quotes);
     }
-    return CSSParsedPseudoDeclaration;
-}());
+}
 exports.CSSParsedPseudoDeclaration = CSSParsedPseudoDeclaration;
-var CSSParsedCounterDeclaration = /** @class */ (function () {
-    function CSSParsedCounterDeclaration(declaration) {
+class CSSParsedCounterDeclaration {
+    constructor(declaration) {
         this.counterIncrement = parse(counter_increment_1.counterIncrement, declaration.counterIncrement);
         this.counterReset = parse(counter_reset_1.counterReset, declaration.counterReset);
     }
-    return CSSParsedCounterDeclaration;
-}());
+}
 exports.CSSParsedCounterDeclaration = CSSParsedCounterDeclaration;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-var parse = function (descriptor, style) {
-    var tokenizer = new tokenizer_1.Tokenizer();
-    var value = style !== null && typeof style !== 'undefined' ? style.toString() : descriptor.initialValue;
+const parse = (descriptor, style) => {
+    const tokenizer = new tokenizer_1.Tokenizer();
+    const value = style !== null && typeof style !== 'undefined' ? style.toString() : descriptor.initialValue;
     tokenizer.write(value);
-    var parser = new parser_1.Parser(tokenizer.read());
+    const parser = new parser_1.Parser(tokenizer.read());
     switch (descriptor.type) {
         case IPropertyDescriptor_1.PropertyDescriptorParsingType.IDENT_VALUE:
-            var token = parser.parseComponentValue();
+            const token = parser.parseComponentValue();
             return descriptor.parse(parser_1.isIdentToken(token) ? token.value : descriptor.initialValue);
         case IPropertyDescriptor_1.PropertyDescriptorParsingType.VALUE:
             return descriptor.parse(parser.parseComponentValue());
@@ -190,13 +187,13 @@ var parse = function (descriptor, style) {
                 case 'image':
                     return image_1.image.parse(parser.parseComponentValue());
                 case 'length':
-                    var length_2 = parser.parseComponentValue();
-                    return length_1.isLength(length_2) ? length_2 : length_percentage_1.ZERO_LENGTH;
+                    const length = parser.parseComponentValue();
+                    return length_1.isLength(length) ? length : length_percentage_1.ZERO_LENGTH;
                 case 'length-percentage':
-                    var value_1 = parser.parseComponentValue();
-                    return length_percentage_1.isLengthPercentage(value_1) ? value_1 : length_percentage_1.ZERO_LENGTH;
+                    const value = parser.parseComponentValue();
+                    return length_percentage_1.isLengthPercentage(value) ? value : length_percentage_1.ZERO_LENGTH;
             }
     }
-    throw new Error("Attempting to parse unsupported css format type");
+    throw new Error(`Attempting to parse unsupported css format type`);
 };
 //# sourceMappingURL=index.js.map

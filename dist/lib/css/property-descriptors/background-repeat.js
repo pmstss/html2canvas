@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var IPropertyDescriptor_1 = require("../IPropertyDescriptor");
-var parser_1 = require("../syntax/parser");
+const IPropertyDescriptor_1 = require("../IPropertyDescriptor");
+const parser_1 = require("../syntax/parser");
 var BACKGROUND_REPEAT;
 (function (BACKGROUND_REPEAT) {
     BACKGROUND_REPEAT[BACKGROUND_REPEAT["REPEAT"] = 0] = "REPEAT";
@@ -14,18 +14,16 @@ exports.backgroundRepeat = {
     initialValue: 'repeat',
     prefix: false,
     type: IPropertyDescriptor_1.PropertyDescriptorParsingType.LIST,
-    parse: function (tokens) {
+    parse: (tokens) => {
         return parser_1.parseFunctionArgs(tokens)
-            .map(function (values) {
-            return values
-                .filter(parser_1.isIdentToken)
-                .map(function (token) { return token.value; })
-                .join(' ');
-        })
+            .map(values => values
+            .filter(parser_1.isIdentToken)
+            .map(token => token.value)
+            .join(' '))
             .map(parseBackgroundRepeat);
     }
 };
-var parseBackgroundRepeat = function (value) {
+const parseBackgroundRepeat = (value) => {
     switch (value) {
         case 'no-repeat':
             return BACKGROUND_REPEAT.NO_REPEAT;

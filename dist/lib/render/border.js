@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var bezier_curve_1 = require("./bezier-curve");
-exports.parsePathForBorder = function (curves, borderSide) {
+const bezier_curve_1 = require("./bezier-curve");
+exports.parsePathForBorder = (curves, borderSide) => {
     switch (borderSide) {
         case 0:
             return createPathFromCurves(curves.topLeftBorderBox, curves.topLeftPaddingBox, curves.topRightBorderBox, curves.topRightPaddingBox);
@@ -14,8 +14,8 @@ exports.parsePathForBorder = function (curves, borderSide) {
             return createPathFromCurves(curves.bottomLeftBorderBox, curves.bottomLeftPaddingBox, curves.topLeftBorderBox, curves.topLeftPaddingBox);
     }
 };
-var createPathFromCurves = function (outer1, inner1, outer2, inner2) {
-    var path = [];
+const createPathFromCurves = (outer1, inner1, outer2, inner2) => {
+    const path = [];
     if (bezier_curve_1.isBezierCurve(outer1)) {
         path.push(outer1.subdivide(0.5, false));
     }

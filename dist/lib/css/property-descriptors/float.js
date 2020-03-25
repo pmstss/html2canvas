@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var IPropertyDescriptor_1 = require("../IPropertyDescriptor");
+const IPropertyDescriptor_1 = require("../IPropertyDescriptor");
 var FLOAT;
 (function (FLOAT) {
     FLOAT[FLOAT["NONE"] = 0] = "NONE";
@@ -14,7 +14,7 @@ exports.float = {
     initialValue: 'none',
     prefix: false,
     type: IPropertyDescriptor_1.PropertyDescriptorParsingType.IDENT_VALUE,
-    parse: function (float) {
+    parse: (float) => {
         switch (float) {
             case 'left':
                 return FLOAT.LEFT;

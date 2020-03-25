@@ -1,19 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var IPropertyDescriptor_1 = require("../IPropertyDescriptor");
-var parser_1 = require("../syntax/parser");
+const IPropertyDescriptor_1 = require("../IPropertyDescriptor");
+const parser_1 = require("../syntax/parser");
 exports.display = {
     name: 'display',
     initialValue: 'inline-block',
     prefix: false,
     type: IPropertyDescriptor_1.PropertyDescriptorParsingType.LIST,
-    parse: function (tokens) {
-        return tokens.filter(parser_1.isIdentToken).reduce(function (bit, token) {
+    parse: (tokens) => {
+        return tokens.filter(parser_1.isIdentToken).reduce((bit, token) => {
             return bit | parseDisplayValue(token.value);
         }, 0 /* NONE */);
     }
 };
-var parseDisplayValue = function (display) {
+const parseDisplayValue = (display) => {
     switch (display) {
         case 'block':
             return 2 /* BLOCK */;

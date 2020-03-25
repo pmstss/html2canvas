@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var IPropertyDescriptor_1 = require("../IPropertyDescriptor");
+const IPropertyDescriptor_1 = require("../IPropertyDescriptor");
 var LIST_STYLE_POSITION;
 (function (LIST_STYLE_POSITION) {
     LIST_STYLE_POSITION[LIST_STYLE_POSITION["INSIDE"] = 0] = "INSIDE";
@@ -11,7 +11,7 @@ exports.listStylePosition = {
     initialValue: 'outside',
     prefix: false,
     type: IPropertyDescriptor_1.PropertyDescriptorParsingType.IDENT_VALUE,
-    parse: function (position) {
+    parse: (position) => {
         switch (position) {
             case 'inside':
                 return LIST_STYLE_POSITION.INSIDE;

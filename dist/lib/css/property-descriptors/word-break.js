@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var IPropertyDescriptor_1 = require("../IPropertyDescriptor");
+const IPropertyDescriptor_1 = require("../IPropertyDescriptor");
 var WORD_BREAK;
 (function (WORD_BREAK) {
     WORD_BREAK["NORMAL"] = "normal";
@@ -12,7 +12,7 @@ exports.wordBreak = {
     initialValue: 'normal',
     prefix: false,
     type: IPropertyDescriptor_1.PropertyDescriptorParsingType.IDENT_VALUE,
-    parse: function (wordBreak) {
+    parse: (wordBreak) => {
         switch (wordBreak) {
             case 'break-all':
                 return WORD_BREAK.BREAK_ALL;

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var IPropertyDescriptor_1 = require("../IPropertyDescriptor");
+const IPropertyDescriptor_1 = require("../IPropertyDescriptor");
 var LIST_STYLE_TYPE;
 (function (LIST_STYLE_TYPE) {
     LIST_STYLE_TYPE[LIST_STYLE_TYPE["NONE"] = -1] = "NONE";
@@ -63,7 +63,7 @@ exports.listStyleType = {
     initialValue: 'none',
     prefix: false,
     type: IPropertyDescriptor_1.PropertyDescriptorParsingType.IDENT_VALUE,
-    parse: function (type) {
+    parse: (type) => {
         switch (type) {
             case 'disc':
                 return LIST_STYLE_TYPE.DISC;

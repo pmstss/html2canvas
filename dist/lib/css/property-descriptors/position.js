@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var IPropertyDescriptor_1 = require("../IPropertyDescriptor");
+const IPropertyDescriptor_1 = require("../IPropertyDescriptor");
 var POSITION;
 (function (POSITION) {
     POSITION[POSITION["STATIC"] = 0] = "STATIC";
@@ -14,7 +14,7 @@ exports.position = {
     initialValue: 'static',
     prefix: false,
     type: IPropertyDescriptor_1.PropertyDescriptorParsingType.IDENT_VALUE,
-    parse: function (position) {
+    parse: (position) => {
         switch (position) {
             case 'relative':
                 return POSITION.RELATIVE;

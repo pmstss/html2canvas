@@ -1,15 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var parser_1 = require("../syntax/parser");
-var tokenizer_1 = require("../syntax/tokenizer");
-var length_percentage_1 = require("./length-percentage");
-var DEG = 'deg';
-var GRAD = 'grad';
-var RAD = 'rad';
-var TURN = 'turn';
+const parser_1 = require("../syntax/parser");
+const tokenizer_1 = require("../syntax/tokenizer");
+const length_percentage_1 = require("./length-percentage");
+const DEG = 'deg';
+const GRAD = 'grad';
+const RAD = 'rad';
+const TURN = 'turn';
 exports.angle = {
     name: 'angle',
-    parse: function (value) {
+    parse: (value) => {
         if (value.type === tokenizer_1.TokenType.DIMENSION_TOKEN) {
             switch (value.unit) {
                 case DEG:
@@ -22,10 +22,10 @@ exports.angle = {
                     return Math.PI * 2 * value.number;
             }
         }
-        throw new Error("Unsupported angle type");
+        throw new Error(`Unsupported angle type`);
     }
 };
-exports.isAngle = function (value) {
+exports.isAngle = (value) => {
     if (value.type === tokenizer_1.TokenType.DIMENSION_TOKEN) {
         if (value.unit === DEG || value.unit === GRAD || value.unit === RAD || value.unit === TURN) {
             return true;
@@ -33,10 +33,10 @@ exports.isAngle = function (value) {
     }
     return false;
 };
-exports.parseNamedSide = function (tokens) {
-    var sideOrCorner = tokens
+exports.parseNamedSide = (tokens) => {
+    const sideOrCorner = tokens
         .filter(parser_1.isIdentToken)
-        .map(function (ident) { return ident.value; })
+        .map(ident => ident.value)
         .join(' ');
     switch (sideOrCorner) {
         case 'to bottom right':
@@ -74,5 +74,5 @@ exports.parseNamedSide = function (tokens) {
     }
     return 0;
 };
-exports.deg = function (deg) { return (Math.PI * deg) / 180; };
+exports.deg = (deg) => (Math.PI * deg) / 180;
 //# sourceMappingURL=angle.js.map

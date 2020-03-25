@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var IPropertyDescriptor_1 = require("../IPropertyDescriptor");
+const IPropertyDescriptor_1 = require("../IPropertyDescriptor");
 var OVERFLOW_WRAP;
 (function (OVERFLOW_WRAP) {
     OVERFLOW_WRAP["NORMAL"] = "normal";
@@ -11,7 +11,7 @@ exports.overflowWrap = {
     initialValue: 'normal',
     prefix: false,
     type: IPropertyDescriptor_1.PropertyDescriptorParsingType.IDENT_VALUE,
-    parse: function (overflow) {
+    parse: (overflow) => {
         switch (overflow) {
             case 'break-word':
                 return OVERFLOW_WRAP.BREAK_WORD;

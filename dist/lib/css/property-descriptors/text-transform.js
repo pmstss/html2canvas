@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var IPropertyDescriptor_1 = require("../IPropertyDescriptor");
+const IPropertyDescriptor_1 = require("../IPropertyDescriptor");
 var TEXT_TRANSFORM;
 (function (TEXT_TRANSFORM) {
     TEXT_TRANSFORM[TEXT_TRANSFORM["NONE"] = 0] = "NONE";
@@ -13,7 +13,7 @@ exports.textTransform = {
     initialValue: 'none',
     prefix: false,
     type: IPropertyDescriptor_1.PropertyDescriptorParsingType.IDENT_VALUE,
-    parse: function (textTransform) {
+    parse: (textTransform) => {
         switch (textTransform) {
             case 'uppercase':
                 return TEXT_TRANSFORM.UPPERCASE;

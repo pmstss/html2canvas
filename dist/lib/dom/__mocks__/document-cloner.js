@@ -1,17 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var DocumentCloner = /** @class */ (function () {
-    function DocumentCloner() {
+class DocumentCloner {
+    constructor() {
         // eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
         this.clonedReferenceElement = {};
     }
-    DocumentCloner.prototype.toIFrame = function () {
+    toIFrame() {
         return Promise.resolve({});
-    };
-    DocumentCloner.destroy = function () {
+    }
+    static destroy() {
         return true;
-    };
-    return DocumentCloner;
-}());
+    }
+}
 exports.DocumentCloner = DocumentCloner;
 //# sourceMappingURL=document-cloner.js.map

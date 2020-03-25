@@ -1,22 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var length_percentage_1 = require("../css/types/length-percentage");
-var vector_1 = require("./vector");
-var bezier_curve_1 = require("./bezier-curve");
-var BoundCurves = /** @class */ (function () {
-    function BoundCurves(element) {
-        var styles = element.styles;
-        var bounds = element.bounds;
-        var _a = length_percentage_1.getAbsoluteValueForTuple(styles.borderTopLeftRadius, bounds.width, bounds.height), tlh = _a[0], tlv = _a[1];
-        var _b = length_percentage_1.getAbsoluteValueForTuple(styles.borderTopRightRadius, bounds.width, bounds.height), trh = _b[0], trv = _b[1];
-        var _c = length_percentage_1.getAbsoluteValueForTuple(styles.borderBottomRightRadius, bounds.width, bounds.height), brh = _c[0], brv = _c[1];
-        var _d = length_percentage_1.getAbsoluteValueForTuple(styles.borderBottomLeftRadius, bounds.width, bounds.height), blh = _d[0], blv = _d[1];
-        var factors = [];
+const length_percentage_1 = require("../css/types/length-percentage");
+const vector_1 = require("./vector");
+const bezier_curve_1 = require("./bezier-curve");
+class BoundCurves {
+    constructor(element) {
+        const styles = element.styles;
+        const bounds = element.bounds;
+        let [tlh, tlv] = length_percentage_1.getAbsoluteValueForTuple(styles.borderTopLeftRadius, bounds.width, bounds.height);
+        let [trh, trv] = length_percentage_1.getAbsoluteValueForTuple(styles.borderTopRightRadius, bounds.width, bounds.height);
+        let [brh, brv] = length_percentage_1.getAbsoluteValueForTuple(styles.borderBottomRightRadius, bounds.width, bounds.height);
+        let [blh, blv] = length_percentage_1.getAbsoluteValueForTuple(styles.borderBottomLeftRadius, bounds.width, bounds.height);
+        const factors = [];
         factors.push((tlh + trh) / bounds.width);
         factors.push((blh + brh) / bounds.width);
         factors.push((tlv + blv) / bounds.height);
         factors.push((trv + brv) / bounds.height);
-        var maxFactor = Math.max.apply(Math, factors);
+        const maxFactor = Math.max(...factors);
         if (maxFactor > 1) {
             tlh /= maxFactor;
             tlv /= maxFactor;
@@ -27,18 +27,18 @@ var BoundCurves = /** @class */ (function () {
             blh /= maxFactor;
             blv /= maxFactor;
         }
-        var topWidth = bounds.width - trh;
-        var rightHeight = bounds.height - brv;
-        var bottomWidth = bounds.width - brh;
-        var leftHeight = bounds.height - blv;
-        var borderTopWidth = styles.borderTopWidth;
-        var borderRightWidth = styles.borderRightWidth;
-        var borderBottomWidth = styles.borderBottomWidth;
-        var borderLeftWidth = styles.borderLeftWidth;
-        var paddingTop = length_percentage_1.getAbsoluteValue(styles.paddingTop, element.bounds.width);
-        var paddingRight = length_percentage_1.getAbsoluteValue(styles.paddingRight, element.bounds.width);
-        var paddingBottom = length_percentage_1.getAbsoluteValue(styles.paddingBottom, element.bounds.width);
-        var paddingLeft = length_percentage_1.getAbsoluteValue(styles.paddingLeft, element.bounds.width);
+        const topWidth = bounds.width - trh;
+        const rightHeight = bounds.height - brv;
+        const bottomWidth = bounds.width - brh;
+        const leftHeight = bounds.height - blv;
+        const borderTopWidth = styles.borderTopWidth;
+        const borderRightWidth = styles.borderRightWidth;
+        const borderBottomWidth = styles.borderBottomWidth;
+        const borderLeftWidth = styles.borderLeftWidth;
+        const paddingTop = length_percentage_1.getAbsoluteValue(styles.paddingTop, element.bounds.width);
+        const paddingRight = length_percentage_1.getAbsoluteValue(styles.paddingRight, element.bounds.width);
+        const paddingBottom = length_percentage_1.getAbsoluteValue(styles.paddingBottom, element.bounds.width);
+        const paddingLeft = length_percentage_1.getAbsoluteValue(styles.paddingLeft, element.bounds.width);
         this.topLeftBorderBox =
             tlh > 0 || tlv > 0
                 ? getCurvePoints(bounds.left, bounds.top, tlh, tlv, CORNER.TOP_LEFT)
@@ -88,8 +88,7 @@ var BoundCurves = /** @class */ (function () {
                 ? getCurvePoints(bounds.left + borderLeftWidth + paddingLeft, bounds.top + leftHeight, Math.max(0, blh - (borderLeftWidth + paddingLeft)), blv - (borderBottomWidth + paddingBottom), CORNER.BOTTOM_LEFT)
                 : new vector_1.Vector(bounds.left + borderLeftWidth + paddingLeft, bounds.top + bounds.height - (borderBottomWidth + paddingBottom));
     }
-    return BoundCurves;
-}());
+}
 exports.BoundCurves = BoundCurves;
 var CORNER;
 (function (CORNER) {
@@ -98,12 +97,12 @@ var CORNER;
     CORNER[CORNER["BOTTOM_RIGHT"] = 2] = "BOTTOM_RIGHT";
     CORNER[CORNER["BOTTOM_LEFT"] = 3] = "BOTTOM_LEFT";
 })(CORNER || (CORNER = {}));
-var getCurvePoints = function (x, y, r1, r2, position) {
-    var kappa = 4 * ((Math.sqrt(2) - 1) / 3);
-    var ox = r1 * kappa; // control point offset horizontal
-    var oy = r2 * kappa; // control point offset vertical
-    var xm = x + r1; // x-middle
-    var ym = y + r2; // y-middle
+const getCurvePoints = (x, y, r1, r2, position) => {
+    const kappa = 4 * ((Math.sqrt(2) - 1) / 3);
+    const ox = r1 * kappa; // control point offset horizontal
+    const oy = r2 * kappa; // control point offset vertical
+    const xm = x + r1; // x-middle
+    const ym = y + r2; // y-middle
     switch (position) {
         case CORNER.TOP_LEFT:
             return new bezier_curve_1.BezierCurve(new vector_1.Vector(x, ym), new vector_1.Vector(x, ym - oy), new vector_1.Vector(xm - ox, y), new vector_1.Vector(xm, y));
@@ -116,10 +115,10 @@ var getCurvePoints = function (x, y, r1, r2, position) {
             return new bezier_curve_1.BezierCurve(new vector_1.Vector(xm, ym), new vector_1.Vector(xm - ox, ym), new vector_1.Vector(x, y + oy), new vector_1.Vector(x, y));
     }
 };
-exports.calculateBorderBoxPath = function (curves) {
+exports.calculateBorderBoxPath = (curves) => {
     return [curves.topLeftBorderBox, curves.topRightBorderBox, curves.bottomRightBorderBox, curves.bottomLeftBorderBox];
 };
-exports.calculateContentBoxPath = function (curves) {
+exports.calculateContentBoxPath = (curves) => {
     return [
         curves.topLeftContentBox,
         curves.topRightContentBox,
@@ -127,7 +126,7 @@ exports.calculateContentBoxPath = function (curves) {
         curves.bottomLeftContentBox
     ];
 };
-exports.calculatePaddingBoxPath = function (curves) {
+exports.calculatePaddingBoxPath = (curves) => {
     return [
         curves.topLeftPaddingBox,
         curves.topRightPaddingBox,

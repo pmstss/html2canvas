@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var IPropertyDescriptor_1 = require("../IPropertyDescriptor");
+const IPropertyDescriptor_1 = require("../IPropertyDescriptor");
 var VISIBILITY;
 (function (VISIBILITY) {
     VISIBILITY[VISIBILITY["VISIBLE"] = 0] = "VISIBLE";
@@ -12,7 +12,7 @@ exports.visibility = {
     initialValue: 'none',
     prefix: false,
     type: IPropertyDescriptor_1.PropertyDescriptorParsingType.IDENT_VALUE,
-    parse: function (visibility) {
+    parse: (visibility) => {
         switch (visibility) {
             case 'hidden':
                 return VISIBILITY.HIDDEN;
